@@ -1,0 +1,20 @@
+//
+//  PrefixHeader.pch
+//  MusicPlay
+//
+//  Created by 朱力珅 on 2019/3/17.
+//  Copyright © 2019 朱力珅. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+#import "playManager.h"
+
+#define ScreenW [UIScreen mainScreen].bounds.size.width
+#define ScreenH [UIScreen mainScreen].bounds.size.height
+
+#define SafeAreaTopHeight (UIEdgeInsetsEqualToEdgeInsets(self.view.safeAreaInsets, UIEdgeInsetsZero) ? 88 : 64)
+
+#endif /* PrefixHeader_pch */
+
