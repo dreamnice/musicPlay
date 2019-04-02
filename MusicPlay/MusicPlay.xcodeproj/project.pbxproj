@@ -20,6 +20,7 @@
 		DF1C3F9121F39A200049DB4B /* MusicPlayUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F9021F39A200049DB4B /* MusicPlayUITests.m */; };
 		DF60A2DF223A9F7100FF0991 /* playViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF60A2DD223A9F7100FF0991 /* playViewController.m */; };
 		DF60A2E0223A9F7100FF0991 /* playViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF60A2DE223A9F7100FF0991 /* playViewController.xib */; };
+		DF8B018622539681002C3FE3 /* baseSevice.m in Sources */ = {isa = PBXBuildFile; fileRef = DF8B018522539681002C3FE3 /* baseSevice.m */; };
 		DF935FBC2239409D00DFA8CD /* playManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DF935FBB2239409D00DFA8CD /* playManager.m */; };
 		DF935FC7223957AB00DFA8CD /* searchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF935FC5223957AB00DFA8CD /* searchViewController.m */; };
 		DF935FC8223957AB00DFA8CD /* searchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF935FC6223957AB00DFA8CD /* searchViewController.xib */; };
@@ -70,6 +71,8 @@
 		DF60A2DC223A9F7100FF0991 /* playViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = playViewController.h; sourceTree = "<group>"; };
 		DF60A2DD223A9F7100FF0991 /* playViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = playViewController.m; sourceTree = "<group>"; };
 		DF60A2DE223A9F7100FF0991 /* playViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = playViewController.xib; sourceTree = "<group>"; };
+		DF8B018422539681002C3FE3 /* baseSevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = baseSevice.h; sourceTree = "<group>"; };
+		DF8B018522539681002C3FE3 /* baseSevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = baseSevice.m; sourceTree = "<group>"; };
 		DF935FBA2239409D00DFA8CD /* playManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = playManager.h; sourceTree = "<group>"; };
 		DF935FBB2239409D00DFA8CD /* playManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = playManager.m; sourceTree = "<group>"; };
 		DF935FC4223957AB00DFA8CD /* searchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = searchViewController.h; sourceTree = "<group>"; };
@@ -224,6 +227,8 @@
 				DF935FC02239561300DFA8CD /* search */,
 				DF935FBA2239409D00DFA8CD /* playManager.h */,
 				DF935FBB2239409D00DFA8CD /* playManager.m */,
+				DF8B018422539681002C3FE3 /* baseSevice.h */,
+				DF8B018522539681002C3FE3 /* baseSevice.m */,
 			);
 			path = common;
 			sourceTree = "<group>";
@@ -452,6 +457,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DF1C3F7121F39A1F0049DB4B /* ViewController.m in Sources */,
+				DF8B018622539681002C3FE3 /* baseSevice.m in Sources */,
 				DF93FE2A223E22EB004D819E /* singerData.m in Sources */,
 				DF0DE8B522452539009AD610 /* songTableViewCell.m in Sources */,
 				DF935FC7223957AB00DFA8CD /* searchViewController.m in Sources */,
@@ -634,7 +640,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HS2S9B58AB;
-				GCC_PREFIX_HEADER = "/Users/dapao/iOS/工作学习/MusicPlay/MusicPlay/PrefixHeader.pch";
+				GCC_PREFIX_HEADER = /Users/dapao/iOS/GitHub/musicPlay/MusicPlay/MusicPlay/PrefixHeader.pch;
 				INFOPLIST_FILE = MusicPlay/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -656,7 +662,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HS2S9B58AB;
-				GCC_PREFIX_HEADER = "/Users/dapao/iOS/工作学习/MusicPlay/MusicPlay/PrefixHeader.pch";
+				GCC_PREFIX_HEADER = /Users/dapao/iOS/GitHub/musicPlay/MusicPlay/MusicPlay/PrefixHeader.pch;
 				INFOPLIST_FILE = MusicPlay/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (

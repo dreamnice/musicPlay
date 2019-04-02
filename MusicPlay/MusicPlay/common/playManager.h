@@ -7,11 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "songData.h"
 
 //用于OC转swift
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol playManagerDelegate <NSObject>
+
+- (void)getCurrentTime:(NSNumber *)time;
+
+@end
+
 @interface playManager : NSObject
+
+@property (nonatomic, strong) songData *songData;
+
+@property (nonatomic, weak) id<playManagerDelegate> delegate;
 
 /**
  创建单例
@@ -33,6 +44,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)playWithURL:(NSString *)url;
 
 /**
+ 根据songData播放歌曲
+
+ @param song songData
+ */
+- (void)playWithSong:(songData *)songData;
+
+/**
  开始播放
  */
 - (void)myPlay;
@@ -41,6 +59,20 @@ NS_ASSUME_NONNULL_BEGIN
  暂停播放
  */
 - (void)myPause;
+
+/**
+ 添加歌曲列表
+ 
+ @param listArray 歌曲数组
+ */
+- (void)getSongList:(NSArray <songData*> *)listArray currentIndex:(NSInteger)index;
+
+/**
+ 更新歌曲列表
+
+ @param listArray 歌曲数组
+ */
+- (void)addSongList:(NSArray <songData *>*)listArray;
 
 @end
 

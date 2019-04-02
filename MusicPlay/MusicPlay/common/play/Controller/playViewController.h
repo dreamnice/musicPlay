@@ -7,10 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "songData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface playViewController : UIViewController
+
+- (instancetype)initWithSongData:(songData *)song;
 
 @end
 

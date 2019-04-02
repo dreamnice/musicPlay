@@ -9,6 +9,7 @@
 #import "searchViewController.h"
 #import "songData.h"
 #import "songTableViewCell.h"
+#import "playViewController.h"
 
 #import <AFNetworking.h>
 #import <AVFoundation/AVFoundation.h>
@@ -72,6 +73,11 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    playViewController *vc = [[playViewController alloc] initWithSongData:self.songDataArray[indexPath.row]];
+    [[playManager sharedPlay] getSongList:self.songDataArray currentIndex:indexPath.row];
+    [self presentViewController:vc animated:YES completion:nil];
+    
+    /*
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     configuration.timeoutIntervalForRequest = 10;
     AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc]initWithSessionConfiguration:configuration];
@@ -98,6 +104,7 @@
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         NSLog(@"%@",error);
     }];
+    */
 }
 
 - (NSMutableArray *)songDataArray{

@@ -5,9 +5,6 @@
 //  Created by 朱力珅 on 2019/3/13.
 //  Copyright © 2019 朱力珅. All rights reserved.
 //
-
-#import "playManager.h"
-
 #import <AVFoundation/AVFoundation.h>
 
 @interface playManager ()
@@ -18,6 +15,9 @@
 
 @property (nonatomic, copy) NSString *currentURL;
 
+@property (nonatomic, strong) NSMutableArray <songData *>*songListArray;
+
+@property (nonatomic, assign) NSInteger currentIndex;
 @end
 
 @implementation playManager
@@ -31,8 +31,7 @@
 static id instace;
 static dispatch_once_t token;
 
-+ (id)allocWithZone:(struct _NSZone *)zone {
-
++ (instancetype)allocWithZone:(struct _NSZone *)zone {
     dispatch_once(&token, ^{
         instace = [super allocWithZone:zone];
         //设置AVAudioSession后台播放
@@ -43,11 +42,11 @@ static dispatch_once_t token;
     return instace;
 }
 
-- (id)copyWithZone:(NSZone *)zone{
+- (instancetype)copyWithZone:(NSZone *)zone{
     return instace;
 }
 
-- (id)mutableCopyWithZone:(NSZone *)zone{
+- (instancetype)mutableCopyWithZone:(NSZone *)zone{
     return instace;
 }
 
@@ -59,7 +58,7 @@ static dispatch_once_t token;
 
 
 - (void)dealloc{
-    NSLog(@"BaseSevice单例已销毁");
+    NSLog(@"单例已销毁");
 }
 
 
@@ -69,21 +68,106 @@ static dispatch_once_t token;
     if(!url){
         return;
     }
-    AVPlayerItem *item = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:url]];
+    AVURLAsset *asset = [AVURLAsset assetWithURL:[NSURL URLWithString:url]];
+    AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
     if(item){
+        //添加观察者,观察播放动态
+        [self.currentItem removeObserver:self forKeyPath:@"status" context:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.currentItem];
         self.currentItem = item;
+        [self.currentItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerFinish:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.currentItem];
+        [self.myPlayer replaceCurrentItemWithPlayerItem:item];
     }else{
         return;
     }
-    [self.myPlayer replaceCurrentItemWithPlayerItem:item];
+
 }
 
+- (void)playWithSong:(songData *)songData {
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    configuration.timeoutIntervalForRequest = 10;
+    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc]initWithSessionConfiguration:configuration];
+    //错误2
+    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/html",@"text/javascript",@"application/json",@"text/json",@"text/plain",@"application/x-javascript",nil];
+    
+    NSString *songMid = songData.songmid;
+    NSString *playTokenURL = [NSString stringWithFormat:@"https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?format=json205361747&platform=yqq&cid=205361747&songmid=%@&filename=C400%@.m4a&guid=126548448",songMid,songMid];
+    NSString *fileName = [NSString stringWithFormat:@"C400%@.m4a",songMid];
+    [manager GET:playTokenURL parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        NSString *playString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
+        NSLog(@"%@",playString);
+        NSError *err2;
+        id dict2 = [NSJSONSerialization  JSONObjectWithData:[playString dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&err2];
+        NSString *playKey = dict2[@"data"][@"items"][0][@"vkey"];
+        NSString *playkeyUrl = [NSString stringWithFormat:@"http://ws.stream.qqmusic.qq.com/%@?fromtag=0&guid=126548448&vkey=%@",fileName,playKey];
+        [self playWithURL:playkeyUrl];
+      //  [self myPlay];
+        self.songData = songData;
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        NSLog(@"%@",error);
+    }];
+}
+/*笔记
+ kvo检测播放状态
+ */
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
+    if ([keyPath isEqualToString:@"status"]) {
+        AVPlayerItemStatus status = [change[NSKeyValueChangeNewKey] integerValue];
+        if (status == AVPlayerItemStatusReadyToPlay) {
+            NSLog(@"AVPlayerItemStatusReadyToPlay");
+            NSLog(@"%f",CMTimeGetSeconds(self.currentItem.asset.duration));
+            //当准备播放时开始播放
+            [self myPlay];
+        } else if (status == AVPlayerItemStatusUnknown) {
+            NSLog(@"AVPlayerItemStatusUnknown");
+        } else if (status == AVPlayerItemStatusFailed) {
+            NSLog(@"AVPlayerItemStatusFailed");
+        }
+    }
+}
+//开始播放
 - (void)myPlay{
     [self.myPlayer play];
+    /*笔记
+     添加每秒回调
+     */
+    __weak __typeof__(self) weakself = self;
+   [self.myPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:nil usingBlock:^(CMTime time){
+      // NSLog(@"%f",CMTimeGetSeconds(time));
+       NSNumber *num = [NSNumber numberWithInteger:CMTimeGetSeconds(time)];
+       if([weakself.delegate respondsToSelector:@selector(getCurrentTime:)]){
+           [weakself.delegate getCurrentTime:num];
+       }
+    }];
 }
-
-- (void)myPause{
+//暂停
+- (void)myPause {
     [self.myPlayer pause];
+}
+//下一首歌
+- (void)nextSong {
+    if(self.currentIndex >= self.songListArray.count - 1){
+        self.currentIndex = 0;
+    }else{
+        self.currentIndex += 1;
+    }
+    [self playWithSong:self.songListArray[self.currentIndex]];
+}
+//添加歌曲列表
+- (void)getSongList:(NSArray <songData *>*)listArray currentIndex:(NSInteger)index{
+    self.currentIndex = index;
+    self.songListArray = [listArray mutableCopy];;
+}
+//更新歌曲列表
+- (void)addSongList:(NSArray <songData *>*)listArray {
+    [self.songListArray addObjectsFromArray:listArray];
+}
+//结束播放
+- (void)playerFinish:(NSNotification *)notice {
+    [self nextSong];
 }
 
 - (AVPlayer *)myPlayer{
@@ -91,5 +175,13 @@ static dispatch_once_t token;
         _myPlayer = [[AVPlayer alloc] init];
     }
     return _myPlayer;
+}
+
+//懒加载
+- (NSMutableArray <songData *>*)songListArray {
+    if(_songListArray == nil){
+        _songListArray = [NSMutableArray array];
+    }
+    return _songListArray;
 }
 @end
