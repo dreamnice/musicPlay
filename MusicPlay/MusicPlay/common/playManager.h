@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)getCurrentTime:(NSNumber *)time;
 
+- (void)changeSong:(songData *)song;
+
 @end
 
 @interface playManager : NSObject
@@ -59,6 +61,16 @@ NS_ASSUME_NONNULL_BEGIN
  暂停播放
  */
 - (void)myPause;
+
+/**
+ 下一首歌
+ */
+- (void)nextSong;
+
+/**
+ 上一首歌
+ */
+- (void)lastSong;
 
 /**
  添加歌曲列表

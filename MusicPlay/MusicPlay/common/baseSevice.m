@@ -10,6 +10,10 @@
 
 @implementation baseSevice
 
++ (id)shareService {
+    return [[self alloc] init];
+}
+
 static id instace;
 static dispatch_once_t token;
 
@@ -26,4 +30,17 @@ static dispatch_once_t token;
     instace = nil;
 }
 
+- (AFHTTPSessionManager *)manager {
+    if(!_manager){
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        configuration.timeoutIntervalForRequest = 10;
+        AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc]initWithSessionConfiguration:configuration];
+        //错误2
+        manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+        manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+        manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/html",@"text/javascript",@"application/json",@"text/json",@"text/plain",@"application/x-javascript",nil];
+        _manager = manager;
+    }
+    return _manager;
+}
 @end

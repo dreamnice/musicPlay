@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 //销毁单例
 + (void)destroyInstance;
 
+@property (nonatomic, strong) AFHTTPSessionManager *manager;
+
 @end
 
 NS_ASSUME_NONNULL_END

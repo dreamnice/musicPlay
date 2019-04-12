@@ -10,6 +10,7 @@
 		4A1C8210BE9F9FF358B4318B /* libPods-MusicPlay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C398B56AA1736E2D59FA6F45 /* libPods-MusicPlay.a */; };
 		DF0DE8B522452539009AD610 /* songTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DF0DE8B322452539009AD610 /* songTableViewCell.m */; };
 		DF0DE8B622452539009AD610 /* songCellTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF0DE8B422452539009AD610 /* songCellTableViewCell.xib */; };
+		DF1AE2492254D2AC0015ABFF /* musicControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1AE2482254D2AC0015ABFF /* musicControlView.m */; };
 		DF1C3F6E21F39A1F0049DB4B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F6D21F39A1F0049DB4B /* AppDelegate.m */; };
 		DF1C3F7121F39A1F0049DB4B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F7021F39A1F0049DB4B /* ViewController.m */; };
 		DF1C3F7421F39A1F0049DB4B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DF1C3F7221F39A1F0049DB4B /* Main.storyboard */; };
@@ -52,6 +53,8 @@
 		DF0DE8B222452539009AD610 /* songTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = songTableViewCell.h; sourceTree = "<group>"; };
 		DF0DE8B322452539009AD610 /* songTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = songTableViewCell.m; sourceTree = "<group>"; };
 		DF0DE8B422452539009AD610 /* songCellTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = songCellTableViewCell.xib; sourceTree = "<group>"; };
+		DF1AE2472254D2AC0015ABFF /* musicControlView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = musicControlView.h; sourceTree = "<group>"; };
+		DF1AE2482254D2AC0015ABFF /* musicControlView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = musicControlView.m; sourceTree = "<group>"; };
 		DF1C3F6921F39A1F0049DB4B /* MusicPlay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicPlay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF1C3F6C21F39A1F0049DB4B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DF1C3F6D21F39A1F0049DB4B /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -198,6 +201,8 @@
 		DF60A2DA223A9F2200FF0991 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				DF1AE2472254D2AC0015ABFF /* musicControlView.h */,
+				DF1AE2482254D2AC0015ABFF /* musicControlView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -458,6 +463,7 @@
 			files = (
 				DF1C3F7121F39A1F0049DB4B /* ViewController.m in Sources */,
 				DF8B018622539681002C3FE3 /* baseSevice.m in Sources */,
+				DF1AE2492254D2AC0015ABFF /* musicControlView.m in Sources */,
 				DF93FE2A223E22EB004D819E /* singerData.m in Sources */,
 				DF0DE8B522452539009AD610 /* songTableViewCell.m in Sources */,
 				DF935FC7223957AB00DFA8CD /* searchViewController.m in Sources */,

@@ -16,6 +16,9 @@
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource>{
     BOOL isPlay;
+    NSDictionary *lyricDic;
+    NSMutableArray *lyricArray;
+    NSMutableArray *timeArray;
 }
 
 @property (nonatomic, copy) NSString *musicName;
@@ -38,22 +41,6 @@
     [playClick addTarget:self action:@selector(musicPlayClick) forControlEvents:UIControlEventTouchUpInside];
     [textField addTarget:self action:@selector(textFieldsChange:) forControlEvents:UIControlEventEditingChanged];
 }
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 50;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cellid"];
-    if(cell == nil){
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cellid"];
-    }
-    cell.textLabel.text = [NSString stringWithFormat:@"%ld",indexPath.row];
-    return cell;
-}
-
-
-
 
 - (void)musicPlayClick {
     NSString *baseURL = @"https://c.y.qq.com/soso/fcgi-bin/client_search_cp?aggr=1&cr=1&flag_qc=0&p=1&n=30&w=";
@@ -94,11 +81,12 @@
             songData *data = [songData mj_objectWithKeyValues:dataDic];
             [array addObject:data];
         }
-        
         if(array){
             searchViewController *vc = [[searchViewController alloc] initWithDataArray:array];
             [self.navigationController pushViewController:vc animated:YES];
         }
+        
+
 //        NSString *playTokenURL = [NSString stringWithFormat:@"https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?format=json205361747&platform=yqq&cid=205361747&songmid=%@&filename=C400%@.m4a&guid=126548448",songMid,songMid];
 //        NSString *fileName = [NSString stringWithFormat:@"C400%@.m4a",songMid];
 //        [manager GET:playTokenURL parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {

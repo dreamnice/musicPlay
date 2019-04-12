@@ -7,7 +7,9 @@
 //
 #import <AVFoundation/AVFoundation.h>
 
-@interface playManager ()
+@interface playManager (){
+    BOOL isPlay;
+}
 
 @property (nonatomic, strong) AVPlayer *myPlayer;
 
@@ -24,7 +26,7 @@
 
 #pragma mark - init
 
-+ (id)sharedPlay{
++ (id)sharedPlay {
     return [[self alloc] init];
 }
 
@@ -56,11 +58,9 @@ static dispatch_once_t token;
     instace = nil;
 }
 
-
 - (void)dealloc{
     NSLog(@"单例已销毁");
 }
-
 
 #pragma mark - methoes
 
@@ -85,18 +85,11 @@ static dispatch_once_t token;
 }
 
 - (void)playWithSong:(songData *)songData {
-    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    configuration.timeoutIntervalForRequest = 10;
-    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc]initWithSessionConfiguration:configuration];
-    //错误2
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/html",@"text/javascript",@"application/json",@"text/json",@"text/plain",@"application/x-javascript",nil];
-    
+    baseSevice *seviceMangager = [baseSevice shareService];
     NSString *songMid = songData.songmid;
     NSString *playTokenURL = [NSString stringWithFormat:@"https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?format=json205361747&platform=yqq&cid=205361747&songmid=%@&filename=C400%@.m4a&guid=126548448",songMid,songMid];
     NSString *fileName = [NSString stringWithFormat:@"C400%@.m4a",songMid];
-    [manager GET:playTokenURL parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    [seviceMangager.manager GET:playTokenURL parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSString *playString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         NSLog(@"%@",playString);
         NSError *err2;
@@ -104,12 +97,12 @@ static dispatch_once_t token;
         NSString *playKey = dict2[@"data"][@"items"][0][@"vkey"];
         NSString *playkeyUrl = [NSString stringWithFormat:@"http://ws.stream.qqmusic.qq.com/%@?fromtag=0&guid=126548448&vkey=%@",fileName,playKey];
         [self playWithURL:playkeyUrl];
-      //  [self myPlay];
         self.songData = songData;
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         NSLog(@"%@",error);
     }];
 }
+
 /*笔记
  kvo检测播放状态
  */
@@ -128,25 +121,21 @@ static dispatch_once_t token;
         }
     }
 }
+
 //开始播放
 - (void)myPlay{
+    isPlay = YES;
     [self.myPlayer play];
-    /*笔记
-     添加每秒回调
-     */
-    __weak __typeof__(self) weakself = self;
-   [self.myPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:nil usingBlock:^(CMTime time){
-      // NSLog(@"%f",CMTimeGetSeconds(time));
-       NSNumber *num = [NSNumber numberWithInteger:CMTimeGetSeconds(time)];
-       if([weakself.delegate respondsToSelector:@selector(getCurrentTime:)]){
-           [weakself.delegate getCurrentTime:num];
-       }
-    }];
 }
+
 //暂停
 - (void)myPause {
-    [self.myPlayer pause];
+    if(isPlay){
+        isPlay = NO;
+        [self.myPlayer pause];
+    }
 }
+
 //下一首歌
 - (void)nextSong {
     if(self.currentIndex >= self.songListArray.count - 1){
@@ -154,17 +143,39 @@ static dispatch_once_t token;
     }else{
         self.currentIndex += 1;
     }
-    [self playWithSong:self.songListArray[self.currentIndex]];
+    [self changeSong:self.currentIndex];
 }
+
+//上一首歌
+- (void)lastSong {
+    if(self.currentIndex <= 0){
+        self.currentIndex = self.songListArray.count - 1;
+    }else{
+        self.currentIndex -= 1;
+    }
+    [self changeSong:self.currentIndex];
+}
+
+//跳转至指定index歌曲
+- (void)changeSong:(NSInteger)songIndex {
+    if([self.delegate respondsToSelector:@selector(changeSong:)]){
+        [self.delegate changeSong:self.songListArray[songIndex]];
+        [self myPause];
+        [self playWithSong:self.songListArray[songIndex]];
+    }
+}
+
 //添加歌曲列表
 - (void)getSongList:(NSArray <songData *>*)listArray currentIndex:(NSInteger)index{
     self.currentIndex = index;
     self.songListArray = [listArray mutableCopy];;
 }
+
 //更新歌曲列表
 - (void)addSongList:(NSArray <songData *>*)listArray {
     [self.songListArray addObjectsFromArray:listArray];
 }
+
 //结束播放
 - (void)playerFinish:(NSNotification *)notice {
     [self nextSong];
@@ -173,6 +184,17 @@ static dispatch_once_t token;
 - (AVPlayer *)myPlayer{
     if(!_myPlayer){
         _myPlayer = [[AVPlayer alloc] init];
+        /*笔记
+         添加每秒回调
+         */
+        __weak __typeof__(self) weakself = self;
+        [_myPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:nil usingBlock:^(CMTime time){
+            // NSLog(@"%f",CMTimeGetSeconds(time));
+            NSNumber *num = [NSNumber numberWithInteger:CMTimeGetSeconds(time)];
+            if([weakself.delegate respondsToSelector:@selector(getCurrentTime:)]){
+                [weakself.delegate getCurrentTime:num];
+            }
+        }];
     }
     return _myPlayer;
 }

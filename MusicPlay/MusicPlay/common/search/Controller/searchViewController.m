@@ -73,6 +73,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//    [[playManager sharedPlay] pause];
     playViewController *vc = [[playViewController alloc] initWithSongData:self.songDataArray[indexPath.row]];
     [[playManager sharedPlay] getSongList:self.songDataArray currentIndex:indexPath.row];
     [self presentViewController:vc animated:YES completion:nil];
