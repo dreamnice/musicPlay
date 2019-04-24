@@ -7,6 +7,8 @@
 //
 
 #import "AppDelegate.h"
+#import "homePageViewController.h"
+#include "mainTabbarController.h"
 
 @interface AppDelegate ()
 
@@ -16,12 +18,25 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    //设置AVAudioSession后台播放
+    AVAudioSession *session = [AVAudioSession  sharedInstance];
+    [session setActive:YES error:nil];
+    [session setCategory:AVAudioSessionCategoryPlayback error:nil];
+    
+    // 在App启动后开启远程控制事件, 接收来自锁屏界面和上拉菜单的控制
+    [application beginReceivingRemoteControlEvents];
+    
+    
+    homePageViewController *vc = [[homePageViewController alloc] init];
+    UINavigationController *navc = [[UINavigationController alloc] initWithRootViewController:vc];
+    mainTabbarController *tabbarVC = [[mainTabbarController alloc] initWithMainViewController:navc];
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    self.window.rootViewController = tabbarVC;
+    [self.window makeKeyAndVisible];
     return YES;
 }
 
-
-- (void)applicationWillResignActive:(UIApplication *)application {
+    - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 }

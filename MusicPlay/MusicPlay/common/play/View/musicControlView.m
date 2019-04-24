@@ -10,6 +10,8 @@
 
 @interface musicControlView ()
 
+@property (nonatomic, strong) UIImageView *alnumImageView;
+
 @property (nonatomic, strong) UISlider *progresssSlider;
 
 @end
@@ -53,10 +55,23 @@
     [lastSongBtn addTarget:self action:@selector(lastSongClick) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:lastSongBtn];
     
+    UIButton *downloadSongBtn = [UIButton buttonWithType:UIButtonTypeSystem];
+    downloadSongBtn.frame = CGRectMake(20, 350, 50, 20);
+    [downloadSongBtn setTitle:@"下载" forState:UIControlStateNormal];
+    downloadSongBtn.backgroundColor = [UIColor redColor];
+    [downloadSongBtn addTarget:self action:@selector(downloadSongClick) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:downloadSongBtn];
     
-    UISlider *progresssSlider = [[UISlider alloc] initWithFrame:CGRectMake(20, 400, 300, 20)];
-    [self addSubview:progresssSlider];
-    self.progresssSlider = progresssSlider;
+    UIImageView *alnumImageView = [[UIImageView alloc] initWithFrame:CGRectMake(100, 150, 200, 200)];
+    [self addSubview:alnumImageView];
+    self.alnumImageView = alnumImageView;
+    
+    UISlider *progressSlider = [[UISlider alloc] initWithFrame:CGRectMake(20, 400, 300, 20)];
+    [progressSlider addTarget:self action:@selector(progressChange) forControlEvents:UIControlEventTouchUpInside];
+    [progressSlider addTarget:self action:@selector(progressChange) forControlEvents:UIControlEventTouchUpOutside];
+    [progressSlider addTarget:self action:@selector(progressClick) forControlEvents:UIControlEventTouchDown];
+    [self addSubview:progressSlider];
+    self.progresssSlider = progressSlider;
 }
 
 - (void)playClick {
@@ -83,7 +98,34 @@
     }
 }
 
+- (void)downloadSongClick {
+    if([self.delegate respondsToSelector:@selector(downloadSongClick)]) {
+        [self.delegate downloadSongClick];
+    }
+}
+
+- (void)progressClick {
+    if([self.delegate respondsToSelector:@selector(songProgressClick)]){
+        [self.delegate songProgressClick];
+    }
+
+}
+
+- (void)progressChange {
+    if([self.delegate respondsToSelector:@selector(songProgressChange:)]){
+        [self.delegate songProgressChange:self.progresssSlider.value];
+    }
+}
+
 - (void)setSongProgressValue:(float)value animated:(BOOL)animated {
     [self.progresssSlider setValue:value animated:animated];
 }
+
+- (void)setAlubmImageWithURL:(NSString *)url {
+    //对url编码
+    NSString *encodeURL = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    NSURL *imageURL = [NSURL URLWithString:encodeURL];
+    [self.alnumImageView sd_setImageWithURL:imageURL];
+}
+
 @end

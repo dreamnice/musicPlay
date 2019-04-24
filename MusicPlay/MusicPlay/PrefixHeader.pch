@@ -9,15 +9,23 @@
 #ifndef PrefixHeader_pch
 #define PrefixHeader_pch
 
-
+#import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MediaPlayer.h>
 #import <AFNetworking.h>
+#import <UIImageView+WebCache.h>
+
 #import "playManager.h"
 #import "baseSevice.h"
+#import "DPMusicPlayTool.h"
 
 #define ScreenW [UIScreen mainScreen].bounds.size.width
 #define ScreenH [UIScreen mainScreen].bounds.size.height
-
 #define SafeAreaTopHeight (UIEdgeInsetsEqualToEdgeInsets(self.view.safeAreaInsets, UIEdgeInsetsZero) ? 88 : 64)
 
+
+/*
+ NSString * const DPMusicNext = @"music_next";
+ NSString * const DPMusiclast = @"music_last";
+ */
 #endif /* PrefixHeader_pch */
 

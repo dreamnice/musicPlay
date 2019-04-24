@@ -9,10 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "singerData.h"
 
+//防止死锁
+@class DPLocalMusicObject;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface songData : NSObject
 
+- (instancetype)initWithLocalMusicObject:(DPLocalMusicObject *)object;
 /**
  歌曲KEY
  */
@@ -33,6 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSMutableArray <singerData *>*singerArray;
 
 @property (nonatomic, strong) NSMutableArray <songData *>*grpArray;
+
+@property (nonatomic, copy) NSString *playURL;
+
+@property (nonatomic, copy) NSString *localFileURL;
 
 @end
 

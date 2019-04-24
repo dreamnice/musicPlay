@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface searchViewController : UIViewController
 
 - (id)initWithDataArray:(NSArray *)dataArray;
+- (id)initWithLocalSong;
 
 @end
 

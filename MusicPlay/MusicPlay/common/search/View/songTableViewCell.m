@@ -39,7 +39,6 @@
         make.height.mas_equalTo(20);
         make.width.mas_equalTo(300);
     }];
-    songNameLabel.text = @"我完全没有任何理由理你";
     self.songNameLabel = songNameLabel;
     
     UILabel *singerAndAlbumLabel = [[UILabel alloc] init];

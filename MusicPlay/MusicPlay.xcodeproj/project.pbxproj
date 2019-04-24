@@ -10,6 +10,7 @@
 		4A1C8210BE9F9FF358B4318B /* libPods-MusicPlay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C398B56AA1736E2D59FA6F45 /* libPods-MusicPlay.a */; };
 		DF0DE8B522452539009AD610 /* songTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DF0DE8B322452539009AD610 /* songTableViewCell.m */; };
 		DF0DE8B622452539009AD610 /* songCellTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF0DE8B422452539009AD610 /* songCellTableViewCell.xib */; };
+		DF0E9C952264D2BA00AD235E /* lyricData.m in Sources */ = {isa = PBXBuildFile; fileRef = DF0E9C942264D2BA00AD235E /* lyricData.m */; };
 		DF1AE2492254D2AC0015ABFF /* musicControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1AE2482254D2AC0015ABFF /* musicControlView.m */; };
 		DF1C3F6E21F39A1F0049DB4B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F6D21F39A1F0049DB4B /* AppDelegate.m */; };
 		DF1C3F7121F39A1F0049DB4B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F7021F39A1F0049DB4B /* ViewController.m */; };
@@ -19,6 +20,12 @@
 		DF1C3F7C21F39A200049DB4B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F7B21F39A200049DB4B /* main.m */; };
 		DF1C3F8621F39A200049DB4B /* MusicPlayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F8521F39A200049DB4B /* MusicPlayTests.m */; };
 		DF1C3F9121F39A200049DB4B /* MusicPlayUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F9021F39A200049DB4B /* MusicPlayUITests.m */; };
+		DF283C092270A91B0012D5B1 /* songSearchBar.m in Sources */ = {isa = PBXBuildFile; fileRef = DF283C082270A91B0012D5B1 /* songSearchBar.m */; };
+		DF283C0D2270A98D0012D5B1 /* homePageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF283C0B2270A98D0012D5B1 /* homePageViewController.m */; };
+		DF283C0E2270A98D0012D5B1 /* homePageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF283C0C2270A98D0012D5B1 /* homePageViewController.xib */; };
+		DF283C152270B6260012D5B1 /* resultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF283C132270B6260012D5B1 /* resultViewController.m */; };
+		DF283C162270B6260012D5B1 /* resultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF283C142270B6260012D5B1 /* resultViewController.xib */; };
+		DF283C1C2270C86E0012D5B1 /* DPSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF283C1B2270C86E0012D5B1 /* DPSearchController.m */; };
 		DF60A2DF223A9F7100FF0991 /* playViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF60A2DD223A9F7100FF0991 /* playViewController.m */; };
 		DF60A2E0223A9F7100FF0991 /* playViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF60A2DE223A9F7100FF0991 /* playViewController.xib */; };
 		DF8B018622539681002C3FE3 /* baseSevice.m in Sources */ = {isa = PBXBuildFile; fileRef = DF8B018522539681002C3FE3 /* baseSevice.m */; };
@@ -27,6 +34,13 @@
 		DF935FC8223957AB00DFA8CD /* searchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF935FC6223957AB00DFA8CD /* searchViewController.xib */; };
 		DF93FE27223E1D7C004D819E /* songData.m in Sources */ = {isa = PBXBuildFile; fileRef = DF93FE26223E1D7C004D819E /* songData.m */; };
 		DF93FE2A223E22EB004D819E /* singerData.m in Sources */ = {isa = PBXBuildFile; fileRef = DF93FE29223E22EB004D819E /* singerData.m */; };
+		DFA6C4702270F2CF00AB3CBA /* mainTabbarController.m in Sources */ = {isa = PBXBuildFile; fileRef = DFA6C46F2270F2CF00AB3CBA /* mainTabbarController.m */; };
+		DFA6C4762270F49200AB3CBA /* tabbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = DFA6C4752270F49200AB3CBA /* tabbarView.m */; };
+		DFA6C4792270FE1200AB3CBA /* DPMusicPlayTool.m in Sources */ = {isa = PBXBuildFile; fileRef = DFA6C4782270FE1100AB3CBA /* DPMusicPlayTool.m */; };
+		DFBEDE7A226E8C610059B30F /* DPMusicDownLoadTool.m in Sources */ = {isa = PBXBuildFile; fileRef = DFBEDE79226E8C610059B30F /* DPMusicDownLoadTool.m */; };
+		DFC40D61226E955C007A5EA5 /* DPResumeDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC40D60226E955C007A5EA5 /* DPResumeDataObject.m */; };
+		DFC40D66226E97EC007A5EA5 /* DPRealmOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC40D65226E97EC007A5EA5 /* DPRealmOperation.m */; };
+		DFC40D69226EB709007A5EA5 /* DPLocalMusicObject.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC40D68226EB709007A5EA5 /* DPLocalMusicObject.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +67,8 @@
 		DF0DE8B222452539009AD610 /* songTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = songTableViewCell.h; sourceTree = "<group>"; };
 		DF0DE8B322452539009AD610 /* songTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = songTableViewCell.m; sourceTree = "<group>"; };
 		DF0DE8B422452539009AD610 /* songCellTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = songCellTableViewCell.xib; sourceTree = "<group>"; };
+		DF0E9C932264D2BA00AD235E /* lyricData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lyricData.h; sourceTree = "<group>"; };
+		DF0E9C942264D2BA00AD235E /* lyricData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = lyricData.m; sourceTree = "<group>"; };
 		DF1AE2472254D2AC0015ABFF /* musicControlView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = musicControlView.h; sourceTree = "<group>"; };
 		DF1AE2482254D2AC0015ABFF /* musicControlView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = musicControlView.m; sourceTree = "<group>"; };
 		DF1C3F6921F39A1F0049DB4B /* MusicPlay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicPlay.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -71,6 +87,16 @@
 		DF1C3F8C21F39A200049DB4B /* MusicPlayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicPlayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF1C3F9021F39A200049DB4B /* MusicPlayUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MusicPlayUITests.m; sourceTree = "<group>"; };
 		DF1C3F9221F39A200049DB4B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DF283C072270A91B0012D5B1 /* songSearchBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = songSearchBar.h; sourceTree = "<group>"; };
+		DF283C082270A91B0012D5B1 /* songSearchBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = songSearchBar.m; sourceTree = "<group>"; };
+		DF283C0A2270A98D0012D5B1 /* homePageViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = homePageViewController.h; sourceTree = "<group>"; };
+		DF283C0B2270A98D0012D5B1 /* homePageViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = homePageViewController.m; sourceTree = "<group>"; };
+		DF283C0C2270A98D0012D5B1 /* homePageViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = homePageViewController.xib; sourceTree = "<group>"; };
+		DF283C122270B6260012D5B1 /* resultViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = resultViewController.h; sourceTree = "<group>"; };
+		DF283C132270B6260012D5B1 /* resultViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = resultViewController.m; sourceTree = "<group>"; };
+		DF283C142270B6260012D5B1 /* resultViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = resultViewController.xib; sourceTree = "<group>"; };
+		DF283C1A2270C86E0012D5B1 /* DPSearchController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPSearchController.h; sourceTree = "<group>"; };
+		DF283C1B2270C86E0012D5B1 /* DPSearchController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPSearchController.m; sourceTree = "<group>"; };
 		DF60A2DC223A9F7100FF0991 /* playViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = playViewController.h; sourceTree = "<group>"; };
 		DF60A2DD223A9F7100FF0991 /* playViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = playViewController.m; sourceTree = "<group>"; };
 		DF60A2DE223A9F7100FF0991 /* playViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = playViewController.xib; sourceTree = "<group>"; };
@@ -86,6 +112,20 @@
 		DF93FE26223E1D7C004D819E /* songData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = songData.m; sourceTree = "<group>"; };
 		DF93FE28223E22EB004D819E /* singerData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = singerData.h; sourceTree = "<group>"; };
 		DF93FE29223E22EB004D819E /* singerData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = singerData.m; sourceTree = "<group>"; };
+		DFA6C46E2270F2CF00AB3CBA /* mainTabbarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mainTabbarController.h; sourceTree = "<group>"; };
+		DFA6C46F2270F2CF00AB3CBA /* mainTabbarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = mainTabbarController.m; sourceTree = "<group>"; };
+		DFA6C4742270F49200AB3CBA /* tabbarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabbarView.h; sourceTree = "<group>"; };
+		DFA6C4752270F49200AB3CBA /* tabbarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabbarView.m; sourceTree = "<group>"; };
+		DFA6C4772270FE1100AB3CBA /* DPMusicPlayTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPMusicPlayTool.h; sourceTree = "<group>"; };
+		DFA6C4782270FE1100AB3CBA /* DPMusicPlayTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPMusicPlayTool.m; sourceTree = "<group>"; };
+		DFBEDE78226E8C610059B30F /* DPMusicDownLoadTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPMusicDownLoadTool.h; sourceTree = "<group>"; };
+		DFBEDE79226E8C610059B30F /* DPMusicDownLoadTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPMusicDownLoadTool.m; sourceTree = "<group>"; };
+		DFC40D5F226E955C007A5EA5 /* DPResumeDataObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPResumeDataObject.h; sourceTree = "<group>"; };
+		DFC40D60226E955C007A5EA5 /* DPResumeDataObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPResumeDataObject.m; sourceTree = "<group>"; };
+		DFC40D64226E97EC007A5EA5 /* DPRealmOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPRealmOperation.h; sourceTree = "<group>"; };
+		DFC40D65226E97EC007A5EA5 /* DPRealmOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPRealmOperation.m; sourceTree = "<group>"; };
+		DFC40D67226EB709007A5EA5 /* DPLocalMusicObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPLocalMusicObject.h; sourceTree = "<group>"; };
+		DFC40D68226EB709007A5EA5 /* DPLocalMusicObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPLocalMusicObject.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +162,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		DF0E9C922264D29E00AD235E /* lyricMode */ = {
+			isa = PBXGroup;
+			children = (
+				DF0E9C932264D2BA00AD235E /* lyricData.h */,
+				DF0E9C942264D2BA00AD235E /* lyricData.m */,
+			);
+			path = lyricMode;
+			sourceTree = "<group>";
+		};
 		DF1C3F6021F39A1F0049DB4B = {
 			isa = PBXGroup;
 			children = (
@@ -148,6 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				DF93FE23223E1921004D819E /* PrefixHeader.pch */,
+				DFC40D63226E97BD007A5EA5 /* Realm */,
 				DF935FB122393CE600DFA8CD /* Tool */,
 				DF935FB322393DFA00DFA8CD /* common */,
 				DF1C3F6C21F39A1F0049DB4B /* AppDelegate.h */,
@@ -179,6 +229,59 @@
 				DF1C3F9221F39A200049DB4B /* Info.plist */,
 			);
 			path = MusicPlayUITests;
+			sourceTree = "<group>";
+		};
+		DF283C022270A8250012D5B1 /* main */ = {
+			isa = PBXGroup;
+			children = (
+				DF283C042270A83F0012D5B1 /* Model */,
+				DF283C052270A8660012D5B1 /* View */,
+				DF283C062270A86B0012D5B1 /* Controller */,
+			);
+			path = main;
+			sourceTree = "<group>";
+		};
+		DF283C032270A8310012D5B1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				DF0E9C922264D29E00AD235E /* lyricMode */,
+				DF93FE24223E1D28004D819E /* songModel */,
+			);
+			name = Model;
+			path = Model.temp_caseinsensitive_rename.;
+			sourceTree = "<group>";
+		};
+		DF283C042270A83F0012D5B1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Model;
+			path = Model.temp_caseinsensitive_rename.;
+			sourceTree = "<group>";
+		};
+		DF283C052270A8660012D5B1 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				DF283C072270A91B0012D5B1 /* songSearchBar.h */,
+				DF283C082270A91B0012D5B1 /* songSearchBar.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		DF283C062270A86B0012D5B1 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				DF283C0A2270A98D0012D5B1 /* homePageViewController.h */,
+				DF283C0B2270A98D0012D5B1 /* homePageViewController.m */,
+				DF283C0C2270A98D0012D5B1 /* homePageViewController.xib */,
+				DF283C122270B6260012D5B1 /* resultViewController.h */,
+				DF283C132270B6260012D5B1 /* resultViewController.m */,
+				DF283C142270B6260012D5B1 /* resultViewController.xib */,
+				DF283C1A2270C86E0012D5B1 /* DPSearchController.h */,
+				DF283C1B2270C86E0012D5B1 /* DPSearchController.m */,
+			);
+			name = Controller;
+			path = Model.temp_caseinsensitive_rename./Controller;
 			sourceTree = "<group>";
 		};
 		DF60A2D8223A9F0F00FF0991 /* play */ = {
@@ -220,6 +323,10 @@
 		DF935FB122393CE600DFA8CD /* Tool */ = {
 			isa = PBXGroup;
 			children = (
+				DFBEDE78226E8C610059B30F /* DPMusicDownLoadTool.h */,
+				DFBEDE79226E8C610059B30F /* DPMusicDownLoadTool.m */,
+				DFA6C4772270FE1100AB3CBA /* DPMusicPlayTool.h */,
+				DFA6C4782270FE1100AB3CBA /* DPMusicPlayTool.m */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -227,7 +334,9 @@
 		DF935FB322393DFA00DFA8CD /* common */ = {
 			isa = PBXGroup;
 			children = (
-				DF93FE24223E1D28004D819E /* songModel */,
+				DF283C032270A8310012D5B1 /* Model */,
+				DFA6C46D2270F24B00AB3CBA /* mainTabbar */,
+				DF283C022270A8250012D5B1 /* main */,
 				DF60A2D8223A9F0F00FF0991 /* play */,
 				DF935FC02239561300DFA8CD /* search */,
 				DF935FBA2239409D00DFA8CD /* playManager.h */,
@@ -284,6 +393,70 @@
 				DF93FE29223E22EB004D819E /* singerData.m */,
 			);
 			path = songModel;
+			sourceTree = "<group>";
+		};
+		DFA6C46D2270F24B00AB3CBA /* mainTabbar */ = {
+			isa = PBXGroup;
+			children = (
+				DFA6C4732270F39600AB3CBA /* Model */,
+				DFA6C4712270F38600AB3CBA /* View */,
+				DFA6C4722270F38B00AB3CBA /* Controller */,
+			);
+			path = mainTabbar;
+			sourceTree = "<group>";
+		};
+		DFA6C4712270F38600AB3CBA /* View */ = {
+			isa = PBXGroup;
+			children = (
+				DFA6C4742270F49200AB3CBA /* tabbarView.h */,
+				DFA6C4752270F49200AB3CBA /* tabbarView.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		DFA6C4722270F38B00AB3CBA /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				DFA6C46E2270F2CF00AB3CBA /* mainTabbarController.h */,
+				DFA6C46F2270F2CF00AB3CBA /* mainTabbarController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		DFA6C4732270F39600AB3CBA /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		DFBEDE7C226E943F0059B30F /* RealmModel */ = {
+			isa = PBXGroup;
+			children = (
+				DFC40D5F226E955C007A5EA5 /* DPResumeDataObject.h */,
+				DFC40D60226E955C007A5EA5 /* DPResumeDataObject.m */,
+				DFC40D67226EB709007A5EA5 /* DPLocalMusicObject.h */,
+				DFC40D68226EB709007A5EA5 /* DPLocalMusicObject.m */,
+			);
+			path = RealmModel;
+			sourceTree = "<group>";
+		};
+		DFC40D62226E97AF007A5EA5 /* RealmOperation */ = {
+			isa = PBXGroup;
+			children = (
+				DFC40D64226E97EC007A5EA5 /* DPRealmOperation.h */,
+				DFC40D65226E97EC007A5EA5 /* DPRealmOperation.m */,
+			);
+			path = RealmOperation;
+			sourceTree = "<group>";
+		};
+		DFC40D63226E97BD007A5EA5 /* Realm */ = {
+			isa = PBXGroup;
+			children = (
+				DFC40D62226E97AF007A5EA5 /* RealmOperation */,
+				DFBEDE7C226E943F0059B30F /* RealmModel */,
+			);
+			path = Realm;
 			sourceTree = "<group>";
 		};
 		FB1144BA3C2C1272AD22E3F4 /* Pods */ = {
@@ -410,12 +583,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF283C0E2270A98D0012D5B1 /* homePageViewController.xib in Resources */,
 				DF1C3F7921F39A200049DB4B /* LaunchScreen.storyboard in Resources */,
 				DF1C3F7621F39A200049DB4B /* Assets.xcassets in Resources */,
 				DF0DE8B622452539009AD610 /* songCellTableViewCell.xib in Resources */,
 				DF935FC8223957AB00DFA8CD /* searchViewController.xib in Resources */,
 				DF60A2E0223A9F7100FF0991 /* playViewController.xib in Resources */,
 				DF1C3F7421F39A1F0049DB4B /* Main.storyboard in Resources */,
+				DF283C162270B6260012D5B1 /* resultViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -461,17 +636,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFA6C4762270F49200AB3CBA /* tabbarView.m in Sources */,
 				DF1C3F7121F39A1F0049DB4B /* ViewController.m in Sources */,
 				DF8B018622539681002C3FE3 /* baseSevice.m in Sources */,
 				DF1AE2492254D2AC0015ABFF /* musicControlView.m in Sources */,
+				DF0E9C952264D2BA00AD235E /* lyricData.m in Sources */,
+				DFA6C4792270FE1200AB3CBA /* DPMusicPlayTool.m in Sources */,
 				DF93FE2A223E22EB004D819E /* singerData.m in Sources */,
 				DF0DE8B522452539009AD610 /* songTableViewCell.m in Sources */,
 				DF935FC7223957AB00DFA8CD /* searchViewController.m in Sources */,
+				DF283C152270B6260012D5B1 /* resultViewController.m in Sources */,
+				DFBEDE7A226E8C610059B30F /* DPMusicDownLoadTool.m in Sources */,
+				DFC40D69226EB709007A5EA5 /* DPLocalMusicObject.m in Sources */,
+				DFC40D61226E955C007A5EA5 /* DPResumeDataObject.m in Sources */,
+				DF283C0D2270A98D0012D5B1 /* homePageViewController.m in Sources */,
 				DF935FBC2239409D00DFA8CD /* playManager.m in Sources */,
 				DF1C3F7C21F39A200049DB4B /* main.m in Sources */,
+				DF283C092270A91B0012D5B1 /* songSearchBar.m in Sources */,
 				DF60A2DF223A9F7100FF0991 /* playViewController.m in Sources */,
+				DFA6C4702270F2CF00AB3CBA /* mainTabbarController.m in Sources */,
 				DF1C3F6E21F39A1F0049DB4B /* AppDelegate.m in Sources */,
+				DFC40D66226E97EC007A5EA5 /* DPRealmOperation.m in Sources */,
 				DF93FE27223E1D7C004D819E /* songData.m in Sources */,
+				DF283C1C2270C86E0012D5B1 /* DPSearchController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -648,7 +835,7 @@
 				DEVELOPMENT_TEAM = HS2S9B58AB;
 				GCC_PREFIX_HEADER = /Users/dapao/iOS/GitHub/musicPlay/MusicPlay/MusicPlay/PrefixHeader.pch;
 				INFOPLIST_FILE = MusicPlay/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -670,7 +857,7 @@
 				DEVELOPMENT_TEAM = HS2S9B58AB;
 				GCC_PREFIX_HEADER = /Users/dapao/iOS/GitHub/musicPlay/MusicPlay/MusicPlay/PrefixHeader.pch;
 				INFOPLIST_FILE = MusicPlay/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

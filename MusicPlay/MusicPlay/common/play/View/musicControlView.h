@@ -20,6 +20,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)lastSongClick;
 
+- (void)downloadSongClick;
+
+- (void)songProgressClick;
+
+- (void)songProgressChange:(float)value;
+
 @end
 
 @interface musicControlView : UIView
@@ -33,6 +39,13 @@ NS_ASSUME_NONNULL_BEGIN
  @param animated 是否有动画
  */
 - (void)setSongProgressValue:(float)value animated:(BOOL)animated;
+
+/**
+ 调整专辑封面
+
+ @param url url
+ */
+- (void)setAlubmImageWithURL:(NSString *)url;
 
 @end
 

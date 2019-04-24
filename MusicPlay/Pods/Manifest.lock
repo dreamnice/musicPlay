@@ -16,23 +16,35 @@ PODS:
     - AFNetworking/NSURLSession
   - Masonry (1.1.0)
   - MJExtension (3.0.15.1)
+  - Realm (3.7.6):
+    - Realm/Headers (= 3.7.6)
+  - Realm/Headers (3.7.6)
+  - SDWebImage (4.4.2):
+    - SDWebImage/Core (= 4.4.2)
+  - SDWebImage/Core (4.4.2)
 
 DEPENDENCIES:
   - AFNetworking
   - Masonry
   - MJExtension
+  - Realm
+  - SDWebImage
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - AFNetworking
     - Masonry
     - MJExtension
+    - Realm
+    - SDWebImage
 
 SPEC CHECKSUMS:
   AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJExtension: 19bc33ce2eee2d319760f5622562cf581a6ff756
+  Realm: 9eaecad54712d6246d08ba34c10f354e4715d7d3
+  SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
 
-PODFILE CHECKSUM: e37ca34e5652e1e30955b85b893ba9e8f4f4f4a4
+PODFILE CHECKSUM: e6c997dd16aac00a59952c5703dca8ea0014c3be
 
 COCOAPODS: 1.5.3

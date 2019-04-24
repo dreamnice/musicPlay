@@ -9,21 +9,21 @@
 #import "ViewController.h"
 #import "searchViewController.h"
 #import "songData.h"
+#import "DPMusicDownLoadTool.h"
 
 #import <AFNetworking.h>
 #import <AVFoundation/AVFoundation.h>
 #import <MJExtension/MJExtension.h>
 
-@interface ViewController ()<UITableViewDelegate,UITableViewDataSource>{
+@interface ViewController (){
     BOOL isPlay;
-    NSDictionary *lyricDic;
-    NSMutableArray *lyricArray;
-    NSMutableArray *timeArray;
 }
 
 @property (nonatomic, copy) NSString *musicName;
 
 @property (nonatomic, strong)AVPlayer *myplayer;
+
+@property (nonatomic, strong) AVPlayer *myPlayer;
 
 @end
 
@@ -33,15 +33,82 @@
     [super viewDidLoad];
     UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(30, 120, 200, 30)];
     textField.placeholder = @"输入歌曲名字";
+    [textField addTarget:self action:@selector(textFieldsChange:) forControlEvents:UIControlEventEditingChanged];
     [self.view addSubview:textField];
+    
+    
     UIButton *playClick = [UIButton buttonWithType:UIButtonTypeCustom];
     playClick.frame = CGRectMake(30, 160, 50, 50);
     playClick.backgroundColor = [UIColor blueColor];
-    [self.view addSubview:playClick];
     [playClick addTarget:self action:@selector(musicPlayClick) forControlEvents:UIControlEventTouchUpInside];
-    [textField addTarget:self action:@selector(textFieldsChange:) forControlEvents:UIControlEventEditingChanged];
+    [self.view addSubview:playClick];
+    
+    UIButton *downClick = [UIButton buttonWithType:UIButtonTypeCustom];
+    downClick.frame = CGRectMake(30, 300, 30, 30);
+    [downClick setBackgroundImage:[UIImage imageNamed:@"downloaded"] forState:UIControlStateNormal];
+    [downClick addTarget:self action:@selector(downBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:downClick];
+    
+    
+    UITableView *tableVew = [[UITableView alloc] initWithFrame:CGRectMake(0, SafeAreaTopHeight, ScreenW, ScreenH - SafeAreaTopHeight) style:UITableViewStylePlain];
+    tableVew.backgroundColor = [UIColor redColor];
+    [self.view addSubview:tableVew];
+    
+    searchViewController *vc = [[searchViewController alloc] initWithLocalSong];
+    UISearchController *searcherController = [[UISearchController alloc] initWithSearchResultsController:vc];
+    [searcherController.searchBar sizeToFit];
+    searcherController.hidesNavigationBarDuringPresentation = NO;
+    self.navigationItem.searchController = searcherController;
+    self.navigationItem.hidesSearchBarWhenScrolling = NO;
+    
+    /*
+    UIImageView *imageView =[[UIImageView alloc]initWithImage:[UIImage imageNamed:@"register_bg.jpeg"]];
+    imageView.frame =self.view.frame;
+    [self.view addSubview:imageView];
+    
+    //iOS 8.0
+    /*
+    模糊效果的三种风格
+     第三方
+     LBBlurredImage
+     
+     @param UIBlurEffectStyle
+    
+     UIBlurEffectStyleExtraLight,  //高亮
+     UIBlurEffectStyleLight,       //亮
+     UIBlurEffectStyleDark         //暗
+
+     
+    UIBlurEffect *blurEffect =[UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+    UIVisualEffectView *effectView =[[UIVisualEffectView alloc]initWithEffect:blurEffect];
+    effectView.frame = CGRectMake(imageView.frame.size.width/2,0,
+                                  imageView.frame.size.width/2, imageView.frame.size.height);
+    [self.view addSubview:effectView];
+    */
+    /*
+    NSString *path = [[NSBundle mainBundle]pathForResource:@"image"ofType:@"jpg"];
+    
+    UIImage *image = [UIImage imageWithContentsOfFile:path];
+    
+    self.view.layer.contents = (id)image.CGImage;
+     */
+ //   self.view.layer.contents = (id)[UIImage imageNamed:@"bg_1"].CGImage;
 }
 
+//- (void)viewWillAppear:(BOOL)animated {
+//    [super viewWillAppear:animated];
+//    [self.navigationController setNavigationBarHidden:YES animated:animated];
+//}
+//
+//- (void)viewWillDisappear:(BOOL)animated {
+//    [super viewWillDisappear:animated];
+//    [self.navigationController setNavigationBarHidden:NO animated:animated];
+//}
+
+- (void)downBtnClick {
+    searchViewController *vc = [[searchViewController alloc] initWithLocalSong];
+    [self.navigationController pushViewController:vc animated:YES];
+}
 - (void)musicPlayClick {
     NSString *baseURL = @"https://c.y.qq.com/soso/fcgi-bin/client_search_cp?aggr=1&cr=1&flag_qc=0&p=1&n=30&w=";
     if(self.musicName == nil || [self.musicName isEqualToString:@""]){
@@ -79,28 +146,14 @@
         NSMutableArray <songData *>*array = [NSMutableArray array];
         for(NSDictionary *dataDic in baseArray){
             songData *data = [songData mj_objectWithKeyValues:dataDic];
-            [array addObject:data];
+            if(![data.songmid isEqualToString:@""] && data.songmid != nil){
+                [array addObject:data];
+            }
         }
         if(array){
             searchViewController *vc = [[searchViewController alloc] initWithDataArray:array];
             [self.navigationController pushViewController:vc animated:YES];
         }
-        
-
-//        NSString *playTokenURL = [NSString stringWithFormat:@"https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?format=json205361747&platform=yqq&cid=205361747&songmid=%@&filename=C400%@.m4a&guid=126548448",songMid,songMid];
-//        NSString *fileName = [NSString stringWithFormat:@"C400%@.m4a",songMid];
-//        [manager GET:playTokenURL parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-//            NSString *playString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-//            NSLog(@"%@",playString);
-//            NSError *err2;
-//            id dict2 = [NSJSONSerialization  JSONObjectWithData:[playString dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&err2];
-//            NSString *playKey = dict2[@"data"][@"items"][0][@"vkey"];
-//            NSString *playkeyUrl = [NSString stringWithFormat:@"http://ws.stream.qqmusic.qq.com/%@?fromtag=0&guid=126548448&vkey=%@",fileName,playKey];
-//            [[playManager sharedPlay] playWithURL:playkeyUrl];
-//            [[playManager sharedPlay] myPlay];
-//        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-//            NSLog(@"%@",err);
-//        }];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         NSLog(@"%@",error);
     }];

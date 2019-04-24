@@ -8,21 +8,32 @@
 
 #import <Foundation/Foundation.h>
 #import "songData.h"
-
+/*
+ 若前面不加static 会报duplicate symbols for architecture x86_64错误
+ 在.h或者pch文件使用 NSString * const 均会报错
+ */
+static NSString * const DPMusicPlay = @"music_play";
+static NSString * const DPMusicPause = @"music_pause";
+static NSString * const DPMusicChange = @"music_change";
+static NSString * const DPMusicLyeicChange = @"musicLyric_change";
 //用于OC转swift
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol playManagerDelegate <NSObject>
 
-- (void)getCurrentTime:(NSNumber *)time;
+- (void)getCurrentTime:(NSNumber *)time isChange:(BOOL)change;
 
 - (void)changeSong:(songData *)song;
+
+- (void)remoteControlProgress:(float)value;
 
 @end
 
 @interface playManager : NSObject
 
-@property (nonatomic, strong) songData *songData;
+@property (nonatomic, readonly, strong) songData *songData;
+
+@property (nonatomic, readonly, assign) BOOL isPlay;
 
 @property (nonatomic, weak) id<playManagerDelegate> delegate;
 
@@ -48,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  根据songData播放歌曲
 
- @param song songData
+ @param songData songData
  */
 - (void)playWithSong:(songData *)songData;
 
@@ -85,6 +96,20 @@ NS_ASSUME_NONNULL_BEGIN
  @param listArray 歌曲数组
  */
 - (void)addSongList:(NSArray <songData *>*)listArray;
+
+/**
+ 调整歌曲进度
+
+ @param value 0-1
+ */
+- (void)changeSongProgress:(float)value;
+
+/**
+ 设置是否处于改变歌曲状态
+
+ @param change bool
+ */
+- (void)setIsChangeState:(BOOL)change;
 
 @end
 
