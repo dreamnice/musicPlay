@@ -14,17 +14,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)playClick;
 
-- (void)pauseClick;
-
 - (void)nextSongClick;
 
 - (void)lastSongClick;
+
+- (void)playaStateChangeClick;
 
 - (void)downloadSongClick;
 
 - (void)songProgressClick;
 
 - (void)songProgressChange:(float)value;
+
+- (void)songProgressChangeEveryTime:(float)value;
 
 @end
 
@@ -41,11 +43,46 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setSongProgressValue:(float)value animated:(BOOL)animated;
 
 /**
+ 设置播放状态
+
+ @param isplay 是否播放
+ */
+- (void)changePlayBtnPlay:(BOOL)isplay;
+
+/**
  调整专辑封面
 
  @param url url
  */
 - (void)setAlubmImageWithURL:(NSString *)url;
+
+/**
+ 设置右边时间
+
+ @param num 秒
+ */
+- (void)setRightLabelText:(NSInteger)num;
+
+/**
+ 设置左边时间
+
+ @param num 秒
+ */
+- (void)setLeftLabelText:(NSInteger)num;
+
+/**
+ 设置播放状态图片
+
+ @param type type
+ */
+- (void)changePlayTypeBtn:(playStateType)type;
+
+/**
+ 设置是否下载
+
+ @param isDownload down
+ */
+- (void)setDownLoadBtnState:(BOOL)isDownload;
 
 @end
 

@@ -7,14 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-
-typedef void (^DonwLoadSuccessBlock)(NSURL *fileURLPath ,NSURLResponse *  response );
-typedef void (^DownLoadfailBlock)(NSError*  error ,NSInteger statusCode);
-typedef void (^DowningProgress)(CGFloat  progress);
-
+#import "DPRealmOperation.h"
+#import "downloadSongModel.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DPMusicDownLoadTool : NSObject
+
+@property (nonatomic, strong) NSMutableArray <downloadSongModel *>*downLoadingModelArray;
+
+@property (nonatomic, strong) NSMutableDictionary *downLoadModelDic;
 
 + (id)shareTool;
 
@@ -23,6 +24,22 @@ NS_ASSUME_NONNULL_BEGIN
                                        fileLocalUrl:(NSURL *)localURL
                                             success:(DonwLoadSuccessBlock)success
                                             failure:(DownLoadfailBlock)failure;
+
+//根据songData下载
+- (void)AFDownLoadFileWithSongData:(songData *)data
+                       addComplete:(AddDonwLoadCompleteBlock)addComplete
+                          progress:(DowningProgress)progress
+                           success:(DonwLoadSuccessBlock)success
+                           failure:(DownLoadfailBlock)failure;
+
+//下载列表点击下载
+- (void)AFResumeDoloadWithInteger:(NSInteger)index
+                         progress:(DowningProgress)progress
+                          success:(DonwLoadSuccessBlock)success
+                          failure:(DownLoadfailBlock)failure;
+
+- (void)cancelDownloadTaskWithModel:(downloadSongModel *)model;
+- (void)cancelAllDownloadTask;
 
 @end
 

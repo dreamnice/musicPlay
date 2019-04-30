@@ -13,14 +13,43 @@
 - (instancetype)initWithSongData:(songData *)data localFileURL:(NSString *)url {
     self = [super init];
     if(self){
+        self.uploadDate = [NSDate date];
+        self.isDownload = data.isDownload;
         self.localFileURL = url;
         self.songid = data.songid;
         self.songmid = data.songmid;
         self.songname = data.songname;
         self.albummid = data.albummid;
         self.albumname = data.albumname;
-        self.lyric = data.lyric;
         self.interval = data.interval;
+        self.playURL = data.playURL;
+        if(data.lyricObject != nil){
+            DPLocalLyricObject *object = [[DPLocalLyricObject alloc] initWithBaseLyric:data.lyricObject.baseLyricl isRoll:data.lyricObject.isRoll lyricConnect:data.lyricObject.lyricConnect songID:data.songid];
+            self.lyricObject = object;
+        }
+        if(data.singerArray.count >= 1) {
+            self.singer = data.singerArray[0].name;
+        }
+    }
+    return self;
+}
+
+- (instancetype)initWithSongData:(songData *)data {
+    self = [super init];
+    if(self){
+        self.uploadDate = [NSDate date];
+        self.songid = data.songid;
+        self.songmid = data.songmid;
+        self.songname = data.songname;
+        self.albummid = data.albummid;
+        self.albumname = data.albumname;
+        self.interval = data.interval;
+        self.isDownload = data.isDownload;
+        self.playURL = data.playURL;
+        if(data.lyricObject != nil){
+            DPLocalLyricObject *object = [[DPLocalLyricObject alloc] initWithBaseLyric:data.lyricObject.baseLyricl isRoll:data.lyricObject.isRoll lyricConnect:data.lyricObject.lyricConnect songID:data.songid];
+            self.lyricObject = object;
+        }
         if(data.singerArray.count >= 1) {
             self.singer = data.singerArray[0].name;
         }

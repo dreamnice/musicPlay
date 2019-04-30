@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface playViewController : UIViewController
 
-- (instancetype)initWithSongData:(songData *)song;
+- (instancetype)initWithSongData:(songData *)song isFromTabbar:(BOOL)isTabbar;
 
 @end
 

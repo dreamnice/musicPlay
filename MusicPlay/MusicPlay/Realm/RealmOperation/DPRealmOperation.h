@@ -19,13 +19,24 @@ NS_ASSUME_NONNULL_BEGIN
 + (id)shareOperation;
 
 - (void)addResumDataObject:(DPResumeDataObject *)object;
+
+- (void)addResumDataObject:(DPResumeDataObject *)object withData:(NSData *)data;
+
 - (void)deleteResumDataObjectWithURLHost:(NSString *)host;
+
+- (void)deleteResumDataObject:(DPResumeDataObject *)object;
+
 - (DPResumeDataObject *)queryWithURLHost:(NSString *)host;
 
 - (void)addLocalMusicObject:(DPLocalMusicObject *)object;
+
 - (void)deleteLocalMusicObjectWithSongid:(NSString *)songid;
-- (DPResumeDataObject *)queryWithSongid:(NSString *)songid;
-- (RLMResults <DPLocalMusicObject *>*)querySongData;
+
+- (DPLocalMusicObject *)queryWithSongid:(NSString *)songid;
+
+- (RLMResults <DPLocalMusicObject *>*)queryDownLoadSongData;
+
+- (RLMResults <DPResumeDataObject *>*)queryResumeSongData;
 @end
 
 NS_ASSUME_NONNULL_END

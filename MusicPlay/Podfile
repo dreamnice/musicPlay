@@ -7,5 +7,6 @@ target’MusicPlay’ do
   pod ‘MJExtension’
   pod ‘SDWebImage’
   pod ‘Realm’
-    
+  pod ‘MJRefresh’
+  pod 'MBProgressHUD'
 end

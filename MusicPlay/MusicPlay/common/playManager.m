@@ -19,9 +19,9 @@
  */
 
 #import <AVFoundation/AVFoundation.h>
+#import <MJExtension/MJExtension.h>
 
 @interface playManager (){
-
     BOOL nextOrLast;
     BOOL connectFail;
     NSInteger failCount;
@@ -35,11 +35,11 @@
 
 @property (nonatomic, assign) NSInteger currentIndex;
 
+@property (nonatomic, assign) NSInteger lastIndex;
+
 @property (nonatomic, assign) BOOL isChange;
 
 @property (nonatomic, strong) NSMutableDictionary *remoteDic;
-
-@property (nonatomic, assign) double currentTime;
 
 @property (nonatomic, assign) double TotleTime;
 
@@ -55,14 +55,14 @@
     return [[self alloc] init];
 }
 
-static id instace;
+static playManager *instace;
 static dispatch_once_t token;
 
 + (instancetype)allocWithZone:(struct _NSZone *)zone {
     dispatch_once(&token, ^{
         instace = [super allocWithZone:zone];
         if(instace){
-            [instace remoteControlEventHandler];
+            [instace setInitData];
         }
     });
     return instace;
@@ -86,6 +86,19 @@ static dispatch_once_t token;
     NSLog(@"单例已销毁");
 }
 
+- (void)setInitData {
+    //处理电话 耳机插拔等通知
+    [[NSNotificationCenter defaultCenter] addObserver:instace selector:@selector(audioSessionInterrupted:) name:AVAudioSessionInterruptionNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:instace selector:@selector(audioSessionRouteChange:) name:AVAudioSessionRouteChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:instace selector:@selector(audioSessionOtherAPPChange:) name: AVAudioSessionSilenceSecondaryAudioHintNotification object:nil];
+    [self remoteControlEventHandler];
+    songData *data = [DPMusicPlayTool getLastPlaySong];
+    if(data){
+        _songData = data;
+        [self.songListArray addObject:data];
+    }
+}
+
 #pragma mark - methoes
 //外部调用方法
 - (void)playWithSong:(songData *)songData {
@@ -94,33 +107,32 @@ static dispatch_once_t token;
 }
 
 - (void)playInClassWithSong:(songData *)songData {
+    [self myChangeSongPause];
     _songData = songData;
-    [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicChange object:_songData];
+    [self setMusicChange:songData];
     self.TotleTime = self.songData.interval;
     self.currentTime = 0;
     [self setNowPlayingInfo];
     if(songData.localFileURL != nil){
-        [self playWithFileURL:songData.localFileURL];
+        NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+        NSString *path = [cachesPath stringByAppendingString:songData.localFileURL];
+        NSLog(@"--------用本地文件播放----------");
+        [self playWithFileURL:path];
     }else{
-        if(songData.playURL != nil){
+        if(songData.playURL != nil && !songData.cutPlay){
+            NSLog(@"--------用本地播放URL播放----------");
             [self playWithURL:songData.playURL];
         }else{
-            baseSevice *seviceMangager = [baseSevice shareService];
-            NSString *songMid = songData.songmid;
-            NSString *playTokenURL = [NSString stringWithFormat:@"https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?format=json205361747&platform=yqq&cid=205361747&songmid=%@&filename=C400%@.m4a&guid=126548448",songMid,songMid];
-            NSString *fileName = [NSString stringWithFormat:@"C400%@.m4a",songMid];
-            [seviceMangager.manager GET:playTokenURL parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                NSString *playString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-                NSLog(@"%@",playString);
-                NSError *err2;
-                id dict2 = [NSJSONSerialization  JSONObjectWithData:[playString dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&err2];
-                NSString *playKey = dict2[@"data"][@"items"][0][@"vkey"];
-                NSString *playkeyUrl = [NSString stringWithFormat:@"http://ws.stream.qqmusic.qq.com/%@?fromtag=0&guid=126548448&vkey=%@",fileName,playKey];
-                if(playKey != nil && !([[playKey stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]length] == 0)){
-                    songData.playURL = playkeyUrl;
+            NSLog(@"--------用获取播放URL播放----------");
+            __weak __typeof__(self) weakself = self;
+            [[DPMusicHttpTool shareTool] getPlayURLWith:songData success:^(NSString * _Nonnull playURL) {
+                if(playURL != nil && !([[playURL stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]length] == 0)){
+                    if(songData.cutPlay){
+                        songData.playURL = playURL;
+                    }
                 }
-                [self playWithURL:playkeyUrl];
-            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+                [weakself playWithURL:playURL];
+            } failure:^(NSError * _Nonnull error) {
                 //链接失败
                 self->connectFail = YES;
             }];
@@ -166,6 +178,26 @@ static dispatch_once_t token;
     }
 }
 
+- (void)setMusicChange:(songData *)data {
+    [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicChange object:nil];
+    [DPMusicPlayTool saveLastSongData:data];
+    if(data.lyricObject != nil){
+        [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicLyricChange object:data.lyricObject];
+        if(data.lyricObject.lyricConnect == NO){
+            [[DPMusicHttpTool shareTool] getLyricWithSongData:_songData complete:^(lyricModel * _Nonnull lyric) {
+                data.lyricObject = lyric;
+                [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicLyricChange object:lyric];
+            }];
+        }
+    }else{
+        [[DPMusicHttpTool shareTool] getLyricWithSongData:_songData complete:^(lyricModel * _Nonnull lyric) {
+            data.lyricObject = lyric;
+            [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicLyricChange object:lyric];
+        }];
+    }
+}
+
+
 /*笔记
  kvo检测播放状态
  */
@@ -176,6 +208,7 @@ static dispatch_once_t token;
         //设置总时长
         [self.remoteDic setObject:[NSNumber numberWithDouble:self.songData.interval] forKey:MPMediaItemPropertyPlaybackDuration];
         [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:self.remoteDic];
+        [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicTotalTimeChange object:nil];
     }
     if(connectFail){
         MPMediaItemArtwork *artImage = [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(300, 300) requestHandler:^UIImage * _Nonnull(CGSize size) {
@@ -195,17 +228,23 @@ static dispatch_once_t token;
             NSLog(@"AVPlayerItemStatusReadyToPlay");
             NSLog(@"%f",CMTimeGetSeconds(self.currentItem.asset.duration));
             failCount = 0;
+            self.songData.cutPlay = NO;
             //当准备播放时开始播放
             [self myPlay];
         }else{
-            //设置自动跳转次数
-            connectFail = YES;
-            failCount += 1;
-            if(failCount < 2){
-                if(nextOrLast){
-                    [self lastSong];
-                }else{
-                    [self nextSong];
+            if(!self.songData.cutPlay){
+                self.songData.cutPlay = YES;
+                [self playInClassWithSong:self.songData];
+            }else{
+                //设置自动跳转次数
+                connectFail = YES;
+                failCount += 1;
+                if(failCount < 2){
+                    if(nextOrLast){
+                        [self lastSong];
+                    }else{
+                        [self nextSong];
+                    }
                 }
             }
         }
@@ -214,21 +253,26 @@ static dispatch_once_t token;
 
 //开始播放
 - (void)myPlay{
-    if(connectFail){
-        [self playInClassWithSong:self.songListArray[self.currentIndex]];
+    if(self.songData.isLastSong){
+        self.songData.isLastSong = NO;
+        [self playInClassWithSong:self.songData];
     }else{
-        [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicPlay object:self.songData];
-        _isPlay = YES;
-        [self.myPlayer play];
-        [self.remoteDic setObject:[NSNumber numberWithDouble:CMTimeGetSeconds(self.myPlayer.currentTime)] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
-        [self.remoteDic setObject:[NSNumber numberWithFloat:1.0] forKey:MPNowPlayingInfoPropertyPlaybackRate];
-        [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:self.remoteDic];
+        if(connectFail){
+            [self playInClassWithSong:self.songListArray[self.currentIndex]];
+        }else{
+            [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicPlay object:nil];
+            _isPlay = YES;
+            [self.myPlayer play];
+            [self.remoteDic setObject:[NSNumber numberWithDouble:CMTimeGetSeconds(self.myPlayer.currentTime)] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+            [self.remoteDic setObject:[NSNumber numberWithFloat:1.0] forKey:MPNowPlayingInfoPropertyPlaybackRate];
+            [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:self.remoteDic];
+        }
     }
 }
 
 //暂停
 - (void)myPause {
-    [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicPause object:self.songData];
+    [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicPause object:nil];
     _isPlay = NO;
     [self.myPlayer pause];
     //设置当前时长
@@ -239,8 +283,30 @@ static dispatch_once_t token;
 
 //暂停
 - (void)myChangeSongPause {
+    [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicPause object:nil];
     _isPlay = NO;
     [self.myPlayer pause];
+}
+
+- (void)tabbarPlay {
+    if(connectFail){
+        [self playInClassWithSong:self.songListArray[self.currentIndex]];
+    }else{
+        _isPlay = YES;
+        [self.myPlayer play];
+        [self.remoteDic setObject:[NSNumber numberWithDouble:CMTimeGetSeconds(self.myPlayer.currentTime)] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+        [self.remoteDic setObject:[NSNumber numberWithFloat:1.0] forKey:MPNowPlayingInfoPropertyPlaybackRate];
+        [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:self.remoteDic];
+    }
+}
+
+- (void)tabbarPause {
+    _isPlay = NO;
+    [self.myPlayer pause];
+    //设置当前时长
+    [self.remoteDic setObject:[NSNumber numberWithDouble:CMTimeGetSeconds(self.myPlayer.currentTime)] forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+    [self.remoteDic setObject:[NSNumber numberWithFloat:0.0] forKey:MPNowPlayingInfoPropertyPlaybackRate];
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:self.remoteDic];
 }
 
 //用于线控
@@ -255,41 +321,126 @@ static dispatch_once_t token;
 //下一首歌
 - (void)nextSong {
     nextOrLast = NO;
-    if(self.currentIndex >= self.songListArray.count - 1){
-        self.currentIndex = 0;
-    }else{
-        self.currentIndex += 1;
+    self.lastIndex = self.currentIndex;
+    switch (_playState) {
+        case playStateListCycleType:
+        {
+            if(self.currentIndex >= self.songListArray.count - 1){
+                self.currentIndex = 0;
+            }else{
+                self.currentIndex += 1;
+            }
+        }
+            break;
+        case playStateRandomType:
+        {
+            NSInteger index = arc4random() % self.songListArray.count;
+            self.currentIndex = index;
+        }
+            break;
+        case playStateOneCycleType:
+            if(self.currentIndex >= self.songListArray.count - 1){
+                self.currentIndex = 0;
+            }else{
+                self.currentIndex += 1;
+            }
+            break;
+        default:
+            
+            break;
     }
+    [self changeSong:self.currentIndex];
+}
+
+- (void)nextOneCycleSong {
+    nextOrLast = NO;
+    self.lastIndex = self.currentIndex;
     [self changeSong:self.currentIndex];
 }
 
 //上一首歌
 - (void)lastSong {
     nextOrLast = YES;
-    if(self.currentIndex <= 0){
-        self.currentIndex = self.songListArray.count - 1;
+    /*
+     1.当lastIndex == currentIndexs时,表示lastIndex上次是在上一首歌改变的,此时则按照策略来进行
+     2.如果不等于,则表示 lastIndex是在下一首歌改变的 此时返回上一首歌 需要使用index
+     */
+    if(self.lastIndex == self.currentIndex){
+        switch (_playState) {
+            case playStateListCycleType:
+            {
+                if(self.currentIndex <= 0){
+                    self.currentIndex = self.songListArray.count - 1;
+                }else{
+                    self.currentIndex -= 1;
+                }
+            }
+                break;
+            case playStateRandomType:
+            {
+                NSInteger index = arc4random() % self.songListArray.count;
+                self.currentIndex = index;
+            }
+            case playStateOneCycleType:
+            {
+                if(self.currentIndex <= 0){
+                    self.currentIndex = self.songListArray.count - 1;
+                }else{
+                    self.currentIndex -= 1;
+                }
+                
+            }
+                break;
+            default:
+                
+                break;
+        }
+        self.lastIndex = self.currentIndex;
     }else{
-        self.currentIndex -= 1;
+        self.currentIndex = self.lastIndex;
     }
     [self changeSong:self.currentIndex];
 }
 
+- (void)changePlayState {
+    switch (_playState) {
+        case playStateListCycleType:
+        {
+            _playState = playStateOneCycleType;
+        }
+            break;
+            case playStateOneCycleType:
+        {
+            _playState = playStateRandomType;
+        }
+            break;
+            case playStateRandomType:
+        {
+            _playState = playStateListCycleType;
+        }
+            break;
+        default:
+            break;
+    }
+}
+
 //结束播放
 - (void)playerFinish:(NSNotification *)notice {
-    [self nextSong];
+    //自动切换歌曲时,是单曲循环则调用单曲循环方法
+    if(self.playState == playStateOneCycleType){
+        [self nextOneCycleSong];
+    }else{
+        [self nextSong];
+    }
 }
 
 //跳转至指定index歌曲
 - (void)changeSong:(NSInteger)songIndex {
-    [self myChangeSongPause];
     [self playInClassWithSong:self.songListArray[songIndex]];
-    if([self.delegate respondsToSelector:@selector(changeSong:)]){
-        [self.delegate changeSong:self.songListArray[songIndex]];
-    }
 }
 
 //调整歌曲进度
-- (void)changeSongProgress:(float)value {
+- (void)changeSongProgress:(double)value {
     [self myPause];
     float time = self.songData.interval * value;
     __weak __typeof__(self) weakself = self;
@@ -299,7 +450,7 @@ static dispatch_once_t token;
     }];
 }
 
-- (void)changeSongProgressInLock:(float)value {
+- (void)changeSongProgressInLock:(double)value {
     [self myPause];
     __weak __typeof__(self) weakself = self;
     [self.myPlayer seekToTime:CMTimeMake(value, 1) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
@@ -316,12 +467,70 @@ static dispatch_once_t token;
 //添加歌曲列表
 - (void)getSongList:(NSArray <songData *>*)listArray currentIndex:(NSInteger)index {
     self.currentIndex = index;
+    self.lastIndex = index;
     self.songListArray = [listArray mutableCopy];;
 }
 
 //更新歌曲列表
 - (void)addSongList:(NSArray <songData *>*)listArray {
     [self.songListArray addObjectsFromArray:listArray];
+}
+
+//注意需要在主线程进行刷新UI操作;
+- (void)audioSessionInterrupted:(NSNotification *)notification {
+    //通知类型
+    NSDictionary *info = notification.userInfo;
+    NSNumber *interruptionType = [info objectForKey:AVAudioSessionInterruptionTypeKey];
+    AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
+    switch (interruptionType.unsignedIntegerValue) {
+        case AVAudioSessionInterruptionTypeBegan:
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self myPause];
+            });
+        }
+            break;
+        case AVAudioSessionInterruptionTypeEnded:
+        {
+
+        } break;
+        default:
+            break;
+    }
+    
+}
+
+- (void)audioSessionRouteChange:(NSNotification *)notification {
+    NSDictionary *info = notification.userInfo;
+    NSNumber *interruptionType = [info objectForKey:AVAudioSessionRouteChangeReasonKey];
+    NSUInteger type = interruptionType.unsignedIntegerValue;
+    if(type == AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory || type == AVAudioSessionRouteChangeReasonOldDeviceUnavailable || type == AVAudioSessionRouteChangeReasonUnknown){
+        dispatch_async(dispatch_get_main_queue(), ^{
+           [self myPause];
+        });
+    }
+}
+
+- (void)audioSessionOtherAPPChange:(NSNotification *)notification {
+    NSDictionary *info = notification.userInfo;
+    NSNumber *interruptionType = [info objectForKey:AVAudioSessionSilenceSecondaryAudioHintTypeKey];
+    NSUInteger type = interruptionType.unsignedIntegerValue;
+    switch (type) {
+        case AVAudioSessionSilenceSecondaryAudioHintTypeBegin:
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self myPause];
+            });
+        }
+            break;
+        case AVAudioSessionSilenceSecondaryAudioHintTypeEnd:
+        {
+            NSLog(@"别的app播放音乐暂停");
+        }
+            break;
+        default:
+            break;
+    }
 }
 
 //设置远程控制
@@ -363,8 +572,11 @@ static dispatch_once_t token;
     [commandCenter.changePlaybackPositionCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
         MPChangePlaybackPositionCommandEvent * playbackPositionEvent = (MPChangePlaybackPositionCommandEvent *)event;
         [weakself changeSongProgressInLock:playbackPositionEvent.positionTime];
-        if([weakself.delegate respondsToSelector:@selector(remoteControlProgress:)]){
-            [weakself.delegate remoteControlProgress:playbackPositionEvent.positionTime];
+        NSNumber *num = [NSNumber numberWithDouble:playbackPositionEvent.positionTime];
+        if(weakself.songData.lyricObject.isRoll){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicRemoteChange object:num];
+            });
         }
         return MPRemoteCommandHandlerStatusSuccess;
     }];
@@ -410,16 +622,36 @@ static dispatch_once_t token;
          */
         __weak __typeof__(self) weakself = self;
         [_myPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:nil usingBlock:^(CMTime time){
-            NSLog(@"%f",CMTimeGetSeconds(time));
+   
             weakself.currentTime = CMTimeGetSeconds(time);
+
             //+0.5防止重复计数
             NSNumber *num = [NSNumber numberWithFloat:CMTimeGetSeconds(time) + 0.5];
-            if([weakself.delegate respondsToSelector:@selector(getCurrentTime:isChange:)]){
-                [weakself.delegate getCurrentTime:num isChange:weakself.isChange];
+            NSDictionary *dic = @{
+                                  @"time" : num,
+                                  @"isChange" : @(weakself.isChange)
+                                  };
+            [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicPerSeconds object:nil userInfo:dic];
+            NSString *str = [[NSString alloc] initWithString:[NSString stringWithFormat:@"%ld",[num integerValue]]];
+            if(weakself.songData.lyricObject != nil){
+                if(weakself.songData.lyricObject.isRoll){
+                    NSUInteger index = [weakself.songData.lyricObject.timeArray indexOfObject:str];
+                    if(index != NSNotFound){
+                        NSNumber *indexNum = [NSNumber numberWithInteger:index];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            //主线程发通知
+                            [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicLyricSearch object:indexNum];
+                        });
+                    }
+                }
             }
         }];
     }
     return _myPlayer;
+}
+
+- (double)currentTime {
+    return CMTimeGetSeconds(self.myPlayer.currentTime);
 }
 
 - (NSMutableArray <songData *>*)songListArray {

@@ -17,12 +17,29 @@
 #import "playManager.h"
 #import "baseSevice.h"
 #import "DPMusicPlayTool.h"
+#import "DPMusicHttpTool.h"
 
 #define ScreenW [UIScreen mainScreen].bounds.size.width
 #define ScreenH [UIScreen mainScreen].bounds.size.height
-#define SafeAreaTopHeight (UIEdgeInsetsEqualToEdgeInsets(self.view.safeAreaInsets, UIEdgeInsetsZero) ? 88 : 64)
+#define SafeH ScreenH - Navi_Height - TabBar_Height
 
+#define keyWindowsafeAreaInsets [UIApplication sharedApplication].keyWindow.safeAreaInsets
+//判断刘海屏幕
+#define INTERFACE_IS_IPHONEX  (@available(iOS 11.0, *) && (keyWindowsafeAreaInsets.bottom > 0)?YES:NO)
+#define Navi_Height (INTERFACE_IS_IPHONEX ? 88 : 64)
+#define TabBar_Height (INTERFACE_IS_IPHONEX ? 83 : 49)
 
+#define myGrayColor [UIColor colorWithRed:109/255.0 green:108/255.0 blue:120/255.0 alpha:1]
+#define albumNameColor [UIColor colorWithRed:109/255.0 green:109/255.0 blue:109/255.0 alpha:1]
+
+static NSString * const DPMusicClick= @"music_Click";
+
+typedef void (^DonwLoadSuccessBlock)(NSURL *fileURLPath ,NSURLResponse *  response );
+typedef void (^AddDonwLoadCompleteBlock)(BOOL inDownloadQueue, BOOL downloadURLFailure);
+typedef void (^DownLoadfailBlock)(NSError *error, BOOL inDownloadQueue);
+typedef void (^DowningProgress)(CGFloat progress);
+typedef void (^DowningComplete)(NSError *error);
+typedef void (^DowningBeigin)();
 /*
  NSString * const DPMusicNext = @"music_next";
  NSString * const DPMusiclast = @"music_last";

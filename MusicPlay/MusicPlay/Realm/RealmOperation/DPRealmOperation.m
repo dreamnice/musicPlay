@@ -27,8 +27,8 @@ static dispatch_once_t token;
     dispatch_once(&token, ^{
         instace = [super allocWithZone:zone];
         if(instace){
-            instace.realm = [RLMRealm defaultRealm];
             NSLog(@"%@",[RLMRealmConfiguration defaultConfiguration].fileURL);
+            instace.realm = [RLMRealm defaultRealm];
         }
     });
     return instace;
@@ -44,6 +44,12 @@ static dispatch_once_t token;
 - (void)addResumDataObject:(DPResumeDataObject *)object {
     [self.realm beginWriteTransaction];
     [self.realm addOrUpdateObject:object];
+    [self.realm commitWriteTransaction];
+}
+
+- (void)addResumDataObject:(DPResumeDataObject *)object withData:(NSData *)data {
+    [self.realm beginWriteTransaction];
+    object.resumeData = [data copy];
     [self.realm commitWriteTransaction];
 }
 
@@ -90,8 +96,16 @@ static dispatch_once_t token;
     return object;
 }
 
-- (RLMResults <DPLocalMusicObject *>*)querySongData {
-    return [DPLocalMusicObject allObjects];
+- (RLMResults <DPLocalMusicObject *>*)queryDownLoadSongData {
+    BOOL downLoad = YES;
+    RLMResults *results = [DPLocalMusicObject objectsWhere:@"isDownload == %d", downLoad];
+    return [results sortedResultsUsingKeyPath:@"uploadDate" ascending:NO];
 }
 
+//ascending 升序
+#pragma mark - 断点续传
+- (RLMResults <DPResumeDataObject *>*)queryResumeSongData {
+    RLMResults *results = [DPResumeDataObject allObjects];
+    return [results sortedResultsUsingKeyPath:@"uploadDate" ascending:NO];
+}
 @end

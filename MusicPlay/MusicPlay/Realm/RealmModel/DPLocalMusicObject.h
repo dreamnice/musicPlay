@@ -7,7 +7,7 @@
 //
 
 #import "RLMObject.h"
-
+#import "DPLocalLyricObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,13 +15,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithSongData:(songData *)data localFileURL:(NSString *)url;
 
+- (instancetype)initWithSongData:(songData *)data;
+
 @property NSString *songmid;
 
 @property NSString *songid;
 
 @property NSString *songname;
-
-@property NSString *lyric;
 
 @property NSString *albumname;
 
@@ -34,6 +34,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString *playURL;
 
 @property NSString *localFileURL;
+
+@property BOOL isDownload;
+
+@property DPLocalLyricObject *lyricObject;
+
+@property NSDate *uploadDate;
 
 @end
 

@@ -10,7 +10,30 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol tabbarViewDelegate <NSObject>
+
+- (void)playBtnClick;
+
+- (void)viewTap;
+
+@end
+
+
 @interface tabbarView : UIView
+
+@property(nonatomic, weak) id <tabbarViewDelegate> delegate;
+
+- (void)setSongName:(NSString *)songName;
+
+- (void)setNextText:(NSString *)text;
+
+- (NSString *)getNextText;
+
+- (void)setAlbumImageWithURL:(NSString *)url;
+
+- (void)setAlbumImageAngle:(CGFloat)angle;
+
+- (void)changePlayBtnPlay:(BOOL)isplay;
 
 @end
 

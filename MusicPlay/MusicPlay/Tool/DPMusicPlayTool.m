@@ -7,10 +7,11 @@
 //
 
 #import "DPMusicPlayTool.h"
+#import <MJExtension.h>
 
 @implementation DPMusicPlayTool
 
-+ (void)encodQQLyric:(NSString *)lyric complete:(void (^)(NSArray *timeArray, NSArray *lyricArray, BOOL isRoll))completeBlock {
++ (void)encodQQLyric:(NSString *)lyric complete:(void (^)(NSArray *timeArray, NSArray *lyricArray, NSString *baseLyric, BOOL isRoll))completeBlock {
     NSMutableArray *lyricArray = [NSMutableArray array];
     NSMutableArray *timeArray = [NSMutableArray array];
     //判断是否滚动
@@ -74,12 +75,7 @@
             [timeArray addObject:@"0"];
         }
     }
-    completeBlock(timeArray, lyricArray, rollFlag);
-}
-
-
-- (NSDictionary *)encodKuGouLyric:(NSString *)lyric {
-    return nil;
+    completeBlock(timeArray, lyricArray, lyric, rollFlag);
 }
 
 + (NSString *)timeToSecond:(NSString *)timeStr {
@@ -105,6 +101,137 @@
     }else{
         return @"";
     }
+}
+
++ (NSString *)encodeTimeWithNum:(NSInteger)num {
+    if(num < 10){
+        return [NSString stringWithFormat:@"00:0%ld",num];
+    }else if(num < 60){
+        return [NSString stringWithFormat:@"00:%ld",num];
+    }else{
+        NSInteger min = num / 60;
+        NSInteger second = num % 60;
+        if(min < 10){
+            if(second < 10){
+                return [NSString stringWithFormat:@"0%ld:0%ld",min, second];
+            }else{
+                return [NSString stringWithFormat:@"0%ld:%ld",min, second];
+            }
+        }else{
+            if(second < 10){
+                return [NSString stringWithFormat:@"%ld:0%ld",min, second];
+            }else{
+                return [NSString stringWithFormat:@"%ld:%ld",min, second];
+            }
+        }
+    }
+}
+/*
+ @property (nonatomic, copy) NSString *songmid;
+ 
+ @property (nonatomic, copy) NSString *songid;
+ 
+ @property (nonatomic, copy) NSString *songname;
+ 
+ @property (nonatomic, copy) NSString *albumname;
+ 
+ @property (nonatomic, copy) NSString *albummid;
+ 
+ @property (nonatomic, assign) NSInteger interval;
+ 
+ @property (nonatomic, strong) NSMutableArray <singerData *>*singerArray;
+ 
+ @property (nonatomic, strong) NSMutableArray <songData *>*grpArray;
+ 
+ @property (nonatomic, copy) NSString *playURL;
+ 
+ @property (nonatomic, copy) NSString *localFileURL;
+ 
+ @property (nonatomic, strong) lyricModel *lyricObject;
+ 
+ @property (nonatomic, assign) BOOL isDownload;
+ 
+ @property (nonatomic, assign) BOOL cutPlay;
+ */
+
++ (songData *)getLastPlaySong {
+    songData *data = nil;
+    NSDictionary *dic = [[NSUserDefaults standardUserDefaults] objectForKey:@"lastMusic"];
+    if(dic){
+        data = [songData mj_objectWithKeyValues:dic];
+        if([dic objectForKey:@"baseLyric"]){
+            [self encodQQLyric:dic[@"baseLyric"] complete:^(NSArray * _Nonnull timeArray, NSArray * _Nonnull lyricArray, NSString * _Nonnull baseLyric, BOOL isRoll) {
+                lyricModel *model = [[lyricModel alloc] initWithTimeArray:timeArray lyricArray:lyricArray baseLyric:baseLyric isRoll:isRoll lyricConect:NO lyricID:data.songid];
+                data.lyricObject = model;
+            }];
+        }else{
+            [[DPMusicHttpTool shareTool] getLyricWithSongData:data complete:^(lyricModel * _Nonnull lyric) {
+                data.lyricObject = lyric;
+            }];
+        }
+        singerData *singgerdata = [[singerData alloc] init];
+        singgerdata.name = [dic objectForKey:@"singger"];
+        data.singerArray = [NSMutableArray arrayWithObject:singgerdata];
+        data.isLastSong = YES;
+    }
+    return data;
+}
+
++ (void)saveLastSongData:(songData *)data {
+    NSDictionary *dic = nil;
+    if(data.isDownload){
+        if(data.lyricObject){
+            dic = @{
+                    @"songmid"      : data.songmid,
+                    @"songid"       : data.songid,
+                    @"songname"     : data.songname,
+                    @"albumname"    : data.albumname,
+                    @"albummid"     : data.albummid,
+                    @"interval"     : [NSNumber numberWithInteger:data.interval],
+                    @"baseLyric"    : data.lyricObject.baseLyricl,
+                    @"singger"      : data.singerArray[0].name,
+                    @"isDownload"   : [NSNumber numberWithBool:YES],
+                    @"localFileURL" : data.localFileURL
+                    };
+        }else{
+            dic = @{
+                    @"songmid"      : data.songmid,
+                    @"songid"       : data.songid,
+                    @"songname"     : data.songname,
+                    @"albumname"    : data.albumname,
+                    @"albummid"     : data.albummid,
+                    @"interval"     : [NSNumber numberWithInteger:data.interval],
+                    @"singger"      : data.singerArray[0].name,
+                    @"isDownload"   : [NSNumber numberWithBool:YES],
+                    @"localFileURL" : data.localFileURL
+                    };
+        }
+    }else{
+        if(data.lyricObject){
+            dic = @{
+                    @"songmid"   : data.songmid,
+                    @"songid"    : data.songid,
+                    @"songname"  : data.songname,
+                    @"albumname" : data.albumname,
+                    @"albummid"  : data.albummid,
+                    @"interval"  : [NSNumber numberWithInteger:data.interval],
+                    @"baseLyric" : data.lyricObject.baseLyricl,
+                    @"singger"   : data.singerArray[0].name
+                    };
+        }else{
+            dic = @{
+                    @"songmid"   : data.songmid,
+                    @"songid"    : data.songid,
+                    @"songname"  : data.songname,
+                    @"albumname" : data.albumname,
+                    @"albummid"  : data.albummid,
+                    @"interval"  : [NSNumber numberWithInteger:data.interval],
+                    @"singger"   : data.singerArray[0].name
+                    };
+        }
+    }
+    [[NSUserDefaults standardUserDefaults] setObject:dic forKey:@"lastMusic"];
+    [[NSUserDefaults standardUserDefaults]  synchronize];
 }
 
 @end

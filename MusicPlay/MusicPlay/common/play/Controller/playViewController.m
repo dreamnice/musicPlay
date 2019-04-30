@@ -8,20 +8,23 @@
 
 #import "playViewController.h"
 #import "musicControlView.h"
-#import "lyricData.h"
+#import "musicInfoView.h"
+#import "lyricModel.h"
 #import "DPMusicDownLoadTool.h"
 #import "DPLocalMusicObject.h"
 #import "DPRealmOperation.h"
 
-@interface playViewController ()<playManagerDelegate, musicControlViewDelegate, UITableViewDelegate, UITableViewDataSource>{
- 
+#import "MBProgressHUD+JJ.h"
+
+@interface playViewController ()<musicControlViewDelegate, musicInfoViewDelegate>{
+    NSString *basePlayURL;
 }
 
 @property (nonatomic, strong) songData *songData;
 
 @property (nonatomic, strong) musicControlView *controlView;
 
-@property (nonatomic, strong) UITableView *lyricTableView;
+@property (nonatomic, strong) musicInfoView *infoView;
 
 @property (nonatomic, strong) NSMutableArray *lyricArray;
 
@@ -29,71 +32,112 @@
 
 @property (nonatomic, assign) BOOL LyricRoll;
 
+@property (nonatomic, assign) BOOL isTabbar;
+
 @end
 
 @implementation playViewController
 
-- (instancetype)initWithSongData:(songData *)song {
+- (instancetype)initWithSongData:(songData *)song isFromTabbar:(BOOL)isTabbar{ 
     self = [super init];
     if(self){
         self.songData = song;
+        lyricModel *lyric = nil;
+        NSNumber *index = nil;
+        //设置歌词
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setLyric:) name:DPMusicLyricChange object:lyric];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(songChange) name:DPMusicChange object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(songPlay) name:DPMusicPlay object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(songPause) name:DPMusicPause object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getCurrentTime:) name:DPMusicPerSeconds object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(lyricSearch:) name:DPMusicLyricSearch object:index];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteControlProgress:) name:DPMusicRemoteChange object:index];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(songTotalTimeChange) name:DPMusicTotalTimeChange object:nil];
+        self.isTabbar = isTabbar;
+        if([[[playManager sharedPlay] songData].songid isEqualToString:song.songid]){
+            self.isTabbar = YES;
+        }
     }
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self setInterface];
+}
 
-    musicControlView *controlView = [[musicControlView alloc] initWithFrame:CGRectMake(0, 0, ScreenW, ScreenH)];
+- (void)setInterface {
+    self.view.backgroundColor = [UIColor blackColor];
+//    UIScreenEdgePanGestureRecognizer *edgePan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(interactiveTransitionRecognizerAction:)];
+//    // 可以拓展为其它侧边滑动手势（如：右侧边滑动进行present...）
+//    edgePan.edges = UIRectEdgeLeft;
+//    [self.view addGestureRecognizer:edgePan];
+    
+    musicInfoView *infoView = [[musicInfoView alloc] initWithFrame:CGRectMake(0, keyWindowsafeAreaInsets.top, ScreenW, ScreenH - 180 - keyWindowsafeAreaInsets.top) isTabbar:self.isTabbar];
+    infoView.backgroundColor = [UIColor blackColor];
+    infoView.delegate = self;
+    [self.view addSubview:infoView];
+    self.infoView = infoView;
+    
+    musicControlView *controlView = [[musicControlView alloc] initWithFrame:CGRectMake(0, ScreenH - 180, ScreenW, 180)];
+    controlView.backgroundColor = [UIColor blackColor];
     controlView.delegate = self;
     [self.view addSubview:controlView];
     self.controlView = controlView;
     
-    UIButton *closeBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-    closeBtn.frame = CGRectMake(20, 100, 20, 20);
-    closeBtn.backgroundColor = [UIColor redColor];
-    [closeBtn addTarget:self action:@selector(closeClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:closeBtn];
-    
-    UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 450, ScreenW, ScreenH - 450) style:UITableViewStylePlain];
-    tableView.delegate = self;
-    tableView.dataSource = self;
-    tableView.separatorStyle = UITableViewCellEditingStyleNone;
-    [self.controlView addSubview:tableView];
-    self.lyricTableView = tableView;
-    
-    playManager *myPlayManager = [playManager sharedPlay];
-    myPlayManager.delegate = self;
-    [myPlayManager playWithSong:self.songData];
-    
-    [self setLyric];
-    [self setAlumImage];
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.lyricArray.count;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *indentifier = @"cellID";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:indentifier];
-    if(cell == nil){
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:indentifier];
+    playManager *manager = [playManager sharedPlay];
+    if(self.isTabbar){
+        if(!self.songData.isLastSong){
+            self.timeArray = [self.songData.lyricObject.timeArray mutableCopy];
+            self.lyricArray = [self.songData.lyricObject.lyricArray mutableCopy];
+            self.LyricRoll = self.songData.lyricObject.isRoll;
+            [self.controlView setSongProgressValue:manager.currentTime/self.songData.interval animated:YES];
+            [self.infoView loadTimeArray:self.songData.lyricObject.timeArray lyricArray:self.songData.lyricObject.lyricArray isRoll:self.songData.lyricObject.isRoll];
+            [self.infoView setTabbrValue:manager.currentTime];
+        }else{
+            [self.infoView loadTimeArray:self.songData.lyricObject.timeArray lyricArray:self.songData.lyricObject.lyricArray isRoll:self.songData.lyricObject.isRoll];
+        }
+    }else{
+        [manager playWithSong:self.songData];
     }
-    cell.textLabel.text = self.lyricArray[indexPath.row];
-    return cell;
+    [self.controlView setRightLabelText:self.songData.interval];
+    [self.controlView changePlayTypeBtn:[[playManager sharedPlay] playState]];
+    [self.infoView setSongName:self.songData.songname singerName:self.songData.singerArray[0].name];
+    NSString *imageStr = [NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.songData.albummid];
+    [self.infoView setAlbumImageWithURL:imageStr];
+    if(manager.isPlay){
+        [self.infoView setImageAnimation:YES];
+        [self.controlView changePlayBtnPlay:YES];
+    }else{
+        [self.infoView setImageAnimation:NO];
+        [self.controlView changePlayBtnPlay:NO];
+    }
+    if(self.songData.isDownload){
+        [self.controlView setDownLoadBtnState:YES];
+    }else{
+        [self.controlView setDownLoadBtnState:NO];
+    }
+    if([[playManager sharedPlay] lastIsLyric]){
+        [self.infoView changeLyricAndAlbumHidden];
+    }
 }
 
+#pragma mark - musicInfoViewDelegate
+- (void)closeBtnClick {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark - musicControlViewDelegate
 - (void)closeClick {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)playClick {
-    [[playManager sharedPlay] myPlay];
-}
-
-- (void)pauseClick {
-    [[playManager sharedPlay] myPause];
+    if([[playManager sharedPlay] isPlay]){
+        [[playManager sharedPlay] myPause];
+    }else{
+        [[playManager sharedPlay] myPlay];
+    }
 }
 
 - (void)nextSongClick {
@@ -102,6 +146,11 @@
 
 - (void)lastSongClick {
     [[playManager sharedPlay] lastSong];
+}
+
+- (void)playaStateChangeClick {
+    [[playManager sharedPlay] changePlayState];
+    [self.controlView changePlayTypeBtn:[[playManager sharedPlay] playState]];
 }
 
 - (void)downloadSongClick {
@@ -114,138 +163,120 @@
 
 - (void)songProgressChange:(float)value {
     [[playManager sharedPlay] changeSongProgress:value];
+    [self.controlView setLeftLabelText:self.songData.interval * value];
     [self adjustLyric:value];
 }
-/*/Users/dapao/Library/Developer/CoreSimulator/Devices/47587521-42E3-4D54-A663-B7910F6AA7F6/data/Containers/Data/Application/63490546-6A7C-47AE-B907-3EB5BC813805/Library/Caches/123.m4a*/
-/*file:///Users/dapao/Library/Developer/CoreSimulator/Devices/47587521-42E3-4D54-A663-B7910F6AA7F6/data/Containers/Data/Application/63490546-6A7C-47AE-B907-3EB5BC813805/Library/Caches/123.m4a*/
+
+- (void)songProgressChangeEveryTime:(float)value {
+    [self.controlView setLeftLabelText:self.songData.interval * value];
+}
+
 - (void)downBtnClick:(songData *)data {
-    NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *path = [cachesPath stringByAppendingString:[NSString stringWithFormat:@"/%@.m4a",data.songid]];
-    if(data.playURL){
-        [[DPMusicDownLoadTool shareTool] AFDownLoadFileWithUrl:data.playURL progress:^(CGFloat progress) {
-            NSLog(@"%f",progress);
-        } fileLocalUrl:[NSURL fileURLWithPath:path] success:^(NSURL *fileURLPath, NSURLResponse *response) {
-            if(fileURLPath) {
-                NSString *localFlieStr = [[fileURLPath absoluteString] substringFromIndex:7];
-                data.localFileURL = localFlieStr;
-                DPLocalMusicObject *object = [[DPLocalMusicObject alloc] initWithSongData:data localFileURL:[NSString stringWithFormat:@"/%@.m4a",data.songid]];
-                [[DPRealmOperation shareOperation] addLocalMusicObject:object];
-            }
-        } failure:^(NSError *error, NSInteger statusCode) {
-            NSLog(@"%@",error);
-        }];
-    }else{
-        
+    if(data.isDownload){
+        [self showAlertWihtMessage:@"歌曲已下载过"];
     }
+    NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+    __weak __typeof__(self) weakself = self;
+    [[DPMusicDownLoadTool shareTool] AFDownLoadFileWithSongData:data addComplete:^(BOOL inDownloadQueue, BOOL downloadURLFailure) {
+        if(!inDownloadQueue && !downloadURLFailure){
+            [self showAlertWihtMessage:@"已加入下载队列"];
+        }else if(inDownloadQueue){
+            [self showAlertWihtMessage:@"歌曲正在下载"];
+        }else{
+            [self showAlertWihtMessage:@"获取下载地址失败"];
+        }
+    } progress:nil success:nil failure:nil];
 }
 
 #pragma mark - 歌词设置
-//歌词初始化
-- (void)setLyric {
-    self.LyricRoll = NO;
-    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-    configuration.timeoutIntervalForRequest = 10;
-    AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc]initWithSessionConfiguration:configuration];
-    //错误2
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/html",@"text/javascript",@"application/json",@"text/json",@"text/plain",@"application/x-javascript",nil];
-    [manager.requestSerializer setValue:@"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36" forHTTPHeaderField:@"User-Agent"];
-    [manager.requestSerializer setValue:@"*/*" forHTTPHeaderField:@"Accept"];
-    [manager.requestSerializer setValue:@"https://y.qq.com/portal/player.html" forHTTPHeaderField:@"Referer"];
-    [manager.requestSerializer setValue:@"zh-CN,zh;q=0.8" forHTTPHeaderField:@"Accept-Language"];
-    [manager.requestSerializer setValue:@"pgv_pvid=8455821612; ts_uid=1596880404; pgv_pvi=9708980224; yq_index=0; pgv_si=s3191448576; pgv_info=ssid=s8059271672; ts_refer=ADTAGmyqq; yq_playdata=s; ts_last=y.qq.com/portal/player.html; yqq_stat=0; yq_playschange=0; player_exist=1; qqmusic_fromtag=66; yplayer_open=1" forHTTPHeaderField:@"Cookie"];
-    [manager.requestSerializer setValue:@"c.y.qq.com" forHTTPHeaderField:@"Host"];
-    NSString *lyricUrl = [NSString stringWithFormat:@"https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg?callback=MusicJsonCallback_lrc&pcachetime=1494070301711&songmid=%@&g_tk=5381&jsonpCallback=MusicJsonCallback_lrc&loginUin=0&hostUin=0&format=jsonp&inCharset=utf8&outCharset=utf-8¬ice=0&platform=yqq&needNewCode=0",self.songData.songmid];
-    //对url进行编码,防止中文
-    NSString *utfUrl = [lyricUrl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-    __weak __typeof__(self) weakself = self;
-    [manager GET:utfUrl parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-        NSString *string = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-        string = [string substringWithRange:NSMakeRange(22, string.length - 23)];
-        id dict2 = [NSJSONSerialization  JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
-        [DPMusicPlayTool encodQQLyric:dict2[@"lyric"] complete:^(NSArray * _Nonnull timeArray, NSArray * _Nonnull lyricArray, BOOL isRoll) {
-            weakself.timeArray = [timeArray mutableCopy];
-            weakself.lyricArray = [lyricArray mutableCopy];
-            weakself.LyricRoll = isRoll;
-            [weakself.lyricTableView reloadData];
-        }];
-
-    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        weakself.LyricRoll = NO;
-        NSString *lyricStr = @"未找到歌词";
-        NSString *timeStr = @"0";
-        [self.lyricArray addObject:lyricStr];
-        [self.timeArray addObject:timeStr];
-        NSLog(@"%@",error);
-    }];
-}
-
 //歌词调整
 - (void)adjustLyric:(float)value {
-    if(self.LyricRoll){
-        NSInteger totalTime = self.songData.interval;
-        NSInteger currentTime = totalTime * value;
-        for(NSInteger i = 0; i <= self.timeArray.count - 1; i++){
-            if([self.timeArray[i] integerValue] > currentTime){
-                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i - 1 inSection:0];
-                [self.lyricTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
-                break;
-            }
-            if(i == self.timeArray.count - 1){
-                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i inSection:0];
-                [self.lyricTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
-            }
-        }
+    NSInteger totalTime = self.songData.interval;
+    float currentTime = totalTime * value;
+    [self.infoView lyricTableViewScrollWithValue:currentTime animated:YES];
+}
+
+- (void)adjustLyricToCurrentTime:(float)currentTime {
+    [self.infoView lyricTableViewScrollWithValue:currentTime animated:YES];
+}
+
+#pragma mark - 接受通知
+//歌词初始化
+- (void)setLyric:(NSNotification *)notification {
+    lyricModel *lyric = notification.object;
+    NSLog(@"测试");
+    [self.infoView loadTimeArray:lyric.timeArray lyricArray:lyric.lyricArray isRoll:lyric.isRoll];
+}
+
+//歌曲切换
+- (void)songChange {
+    self.songData = [[playManager sharedPlay] songData];
+    [self.infoView removeTimeAndLyricArray];
+    [self.controlView setLeftLabelText:0];
+    [self.controlView setRightLabelText:self.songData.interval];
+    [self.infoView setSongName:self.songData.songname singerName:self.songData.singerArray[0].name];
+    if(self.songData.isDownload){
+        [self.controlView setDownLoadBtnState:YES];
+    }else{
+        [self.controlView setDownLoadBtnState:NO];
     }
-}
-
-#pragma mark - 专辑图片设置
-- (void)setAlumImage {
     NSString *imageStr = [NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.songData.albummid];
-    [self.controlView setAlubmImageWithURL:imageStr];
+    [self.infoView setAlbumImageWithURL:imageStr];
 }
 
-#pragma mark - playManagerDelegate
-- (void)getCurrentTime:(NSNumber *)time isChange:(BOOL)change{
+- (void)songTotalTimeChange {
+    [self.controlView setRightLabelText:self.songData.interval];
+}
+
+//播放
+- (void)songPlay {
+    [self.infoView setImageAnimation:YES];
+    [self.controlView changePlayBtnPlay:YES];
+}
+
+//暂停
+- (void)songPause {
+    [self.infoView setImageAnimation:NO];
+    [self.controlView changePlayBtnPlay:NO];
+}
+
+//每秒返回
+- (void)getCurrentTime:(NSNotification *)notification {
+    NSNumber *time = [notification.userInfo objectForKey:@"time"];
+    BOOL change = [[notification.userInfo objectForKey:@"isChange"] boolValue];
     NSInteger currentIntTime = [time integerValue];
     float currentTime = currentIntTime;
     NSInteger totalTime = self.songData.interval;
     if(!change){
         [self.controlView setSongProgressValue:currentTime/totalTime animated:YES];
-    }
-    /*
-     知识点,NSString知识点
-     */
-    NSString *str = [[NSString alloc] initWithString:[NSString stringWithFormat:@"%ld",currentIntTime]];
-    NSLog(@"%@",str);
-    if(self.LyricRoll){
-        NSUInteger index = [self.timeArray indexOfObject:str];
-        if(index != NSNotFound){
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-            [self.lyricTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
-        }
+        [self.controlView setLeftLabelText:currentIntTime];
     }
 }
 
-- (void)changeSong:(songData *)song {
-    self.songData = song;
-    [self setLyric];
-    [self setAlumImage];
+//歌词跳转
+- (void)lyricSearch:(NSNotification *)notification {
+    NSNumber *indexNum = notification.object;
+    [self.infoView lyricTableViewScrollWithNum:[indexNum integerValue] animated:YES];
 }
 
-- (void)remoteControlProgress:(float)value {
-    for(NSInteger i = 0; i <= self.timeArray.count - 1; i++){
-        if([self.timeArray[i] integerValue] > value){
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i - 1 inSection:0];
-            [self.lyricTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
-            break;
-        }
-        if(i == self.timeArray.count - 1){
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i inSection:0];
-            [self.lyricTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
-        }
-    }
+//远程控制
+- (void)remoteControlProgress:(NSNotification *)notification {
+    NSNumber *num = notification.object;
+    double currentTime = [num doubleValue];
+    [self adjustLyricToCurrentTime:currentTime];
+}
+
+//// MARK: - 侧滑Dismiss
+//- (void)interactiveTransitionRecognizerAction:(UIScreenEdgePanGestureRecognizer *)sender {
+//    if (sender.state == UIGestureRecognizerStateBegan){
+//        // 可以此处可以做出判断是需要执行Dismiss操作还是Pop操作
+//        // 此处以Dismiss为列
+//        [self dismissViewControllerAnimated:YES completion:nil];
+//    }
+//}
+
+- (void)showAlertWihtMessage:(NSString *)message {
+    [MBProgressHUD showMessage:message];
 }
 
 #pragma mark - 懒加载
@@ -263,4 +294,8 @@
     return _timeArray;
 }
 
+- (void)dealloc {
+    NSLog(@"播放界面销毁了");
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 @end

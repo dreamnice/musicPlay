@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface searchViewController : UIViewController
+@interface localMusicViewController : UIViewController
 
 - (id)initWithDataArray:(NSArray *)dataArray;
 - (id)initWithLocalSong;

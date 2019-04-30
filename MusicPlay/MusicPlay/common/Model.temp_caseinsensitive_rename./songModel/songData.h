@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "singerData.h"
+#import "lyricModel.h"
+
+
 
 //防止死锁
 @class DPLocalMusicObject;
@@ -26,8 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *songname;
 
-@property (nonatomic, copy) NSString *lyric;
-
 @property (nonatomic, copy) NSString *albumname;
 
 @property (nonatomic, copy) NSString *albummid;
@@ -41,6 +42,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *playURL;
 
 @property (nonatomic, copy) NSString *localFileURL;
+
+@property (nonatomic, strong) lyricModel *lyricObject;
+
+@property (nonatomic, assign) BOOL isDownload;
+
+@property (nonatomic, assign) BOOL cutPlay;
+
+@property (nonatomic, assign) BOOL isLastSong;
 
 @end
 

@@ -37,15 +37,17 @@
 - (instancetype)initWithLocalMusicObject:(DPLocalMusicObject *)object {
     self = [super init];
     if(self){
-        NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-        self.localFileURL = [cachesPath stringByAppendingString:object.localFileURL];
+        if(object.localFileURL){
+            self.localFileURL = object.localFileURL;
+        }
         self.songmid = object.songmid;
         self.songid = object.songid;
         self.songname = object.songname;
-        self.lyric = object.lyric;
         self.albumname = object.albumname;
         self.albummid = object.albummid;
         self.interval = object.interval;
+        self.isDownload = object.isDownload;
+        self.playURL = object.playURL;
         singerData *data = [[singerData alloc] init];
         data.name = object.singer;
         if(data.name == nil || [data.name isEqualToString:@""]){
@@ -53,6 +55,12 @@
         }
         self.singerArray = [NSMutableArray array];
         [self.singerArray addObject:data];
+        if(object.lyricObject != nil){
+            [DPMusicPlayTool encodQQLyric:object.lyricObject.baseLyricl complete:^(NSArray * _Nonnull timeArray, NSArray * _Nonnull lyricArray, NSString * _Nonnull baseLyric, BOOL isRoll) {
+                lyricModel *model = [[lyricModel alloc] initWithTimeArray:timeArray lyricArray:lyricArray baseLyric:object.lyricObject.baseLyricl isRoll:isRoll lyricConect:object.lyricObject.lyricConnect lyricID:object.songid];
+                self.lyricObject = model;
+            }];
+        }
     }
     return self;
 }
