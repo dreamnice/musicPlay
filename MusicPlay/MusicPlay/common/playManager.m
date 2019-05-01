@@ -83,6 +83,7 @@ static dispatch_once_t token;
 }
 
 - (void)dealloc{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSLog(@"单例已销毁");
 }
 
@@ -91,6 +92,8 @@ static dispatch_once_t token;
     [[NSNotificationCenter defaultCenter] addObserver:instace selector:@selector(audioSessionInterrupted:) name:AVAudioSessionInterruptionNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:instace selector:@selector(audioSessionRouteChange:) name:AVAudioSessionRouteChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:instace selector:@selector(audioSessionOtherAPPChange:) name: AVAudioSessionSilenceSecondaryAudioHintNotification object:nil];
+    NSString *songid = nil;
+    [[NSNotificationCenter defaultCenter] addObserver:instace selector:@selector(checkDeleteMusic:) name: DPMusicDelete object:songid];
     [self remoteControlEventHandler];
     songData *data = [DPMusicPlayTool getLastPlaySong];
     if(data){
@@ -105,7 +108,9 @@ static dispatch_once_t token;
     [self playInClassWithSong:songData];
     failCount = 0;
 }
-
+/*
+ 0x7ff2fe168320
+ */
 - (void)playInClassWithSong:(songData *)songData {
     [self myChangeSongPause];
     _songData = songData;
@@ -180,7 +185,6 @@ static dispatch_once_t token;
 
 - (void)setMusicChange:(songData *)data {
     [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicChange object:nil];
-    [DPMusicPlayTool saveLastSongData:data];
     if(data.lyricObject != nil){
         [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicLyricChange object:data.lyricObject];
         if(data.lyricObject.lyricConnect == NO){
@@ -468,7 +472,7 @@ static dispatch_once_t token;
 - (void)getSongList:(NSArray <songData *>*)listArray currentIndex:(NSInteger)index {
     self.currentIndex = index;
     self.lastIndex = index;
-    self.songListArray = [listArray mutableCopy];;
+    self.songListArray = [listArray mutableCopy];
 }
 
 //更新歌曲列表
@@ -613,6 +617,18 @@ static dispatch_once_t token;
     [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:self.remoteDic];
 }
 
+- (void)checkDeleteMusic:(NSNotification *)notification {
+    NSString *songid = notification.object;
+    for(songData *data in self.songListArray) {
+        if([data.songid isEqualToString:songid]){
+            data.isDownload = NO;
+            data.localFileURL = nil;
+            data.fileSizeNum = 0;
+            data.fileSize = nil;
+            break;
+        }
+    }
+}
 #pragma mark - 懒加载
 - (AVPlayer *)myPlayer{
     if(!_myPlayer){
@@ -667,4 +683,5 @@ static dispatch_once_t token;
     }
     return _remoteDic;
 }
+
 @end

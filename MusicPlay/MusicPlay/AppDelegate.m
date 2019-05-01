@@ -41,13 +41,17 @@
     return YES;
 }
 
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    // 实现如下代码，才能使程序处于后台时被杀死，调用applicationWillTerminate:方法
+    [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^(){
+        NSLog(@"后台杀死了");
+    }];
+}
+
 - (void)applicationWillTerminate:(UIApplication *)application {
- //   [[DPMusicDownLoadTool shareTool] cancelAllDownloadTask];
-//    RLMRealm *realm = [RLMRealm defaultRealm];
-//    [realm beginWriteTransaction];
-//    DPResumeDataObject *object = [[DPResumeDataObject alloc] initWithURLHost:@"s测试" resumeData:[NSData data]];
-//    [realm addOrUpdateObject:object];
-//    [realm commitWriteTransaction];
+    NSLog(@"退出程序了");
+    [DPMusicPlayTool saveLastSongData:[[playManager sharedPlay] songData]];
 }
 
 @end

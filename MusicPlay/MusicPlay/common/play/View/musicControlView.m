@@ -126,7 +126,7 @@
     
     UIButton *downLoadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [downLoadBtn setImage:[UIImage imageNamed:@"download_white"] forState:UIControlStateNormal];
-    [downLoadBtn addTarget:self action:@selector(downloadSongClick) forControlEvents:UIControlEventTouchUpInside];
+    [downLoadBtn addTarget:self action:@selector(downloadSongClick:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:downLoadBtn];
     [downLoadBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.mas_equalTo(self.mas_right).offset(-15);
@@ -160,9 +160,9 @@
     }
 }
 
-- (void)downloadSongClick {
-    if([self.delegate respondsToSelector:@selector(downloadSongClick)]) {
-        [self.delegate downloadSongClick];
+- (void)downloadSongClick:(UIButton *)btn {
+    if([self.delegate respondsToSelector:@selector(downloadSongClick:)]) {
+        [self.delegate downloadSongClick:btn];
     }
 }
 

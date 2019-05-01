@@ -43,7 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *localFileURL;
 
+@property (nonatomic, copy) NSString *fileSize;
+
 @property (nonatomic, strong) lyricModel *lyricObject;
+
+@property (nonatomic, assign) int64_t fileSizeNum;
 
 @property (nonatomic, assign) BOOL isDownload;
 

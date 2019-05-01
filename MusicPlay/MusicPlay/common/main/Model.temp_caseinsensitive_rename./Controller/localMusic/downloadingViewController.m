@@ -23,7 +23,7 @@
 - (instancetype)init {
     self = [super init];
     if(self){
-
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newDownloadAdd) name:DPMusicDownloadAddNew object:nil];
     }
     return self;
 }
@@ -49,6 +49,10 @@
     self.downloadTableView = tableView;
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [self.downloadTableView reloadData];
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return [[DPMusicDownLoadTool shareTool] downLoadingModelArray].count;
 }
@@ -60,6 +64,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     downloadSongCell *cell = [downloadSongCell cellWithTableView:tableView isFirstCell:NO];
     cell.model = [[DPMusicDownLoadTool shareTool] downLoadingModelArray][indexPath.row];
+    cell.deleteBtn.indexPath = indexPath;
+    [cell.deleteBtn addTarget:self action:@selector(deleteCell:) forControlEvents:UIControlEventTouchUpInside];
+    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     __weak __typeof__(self) weakself = self;
     __weak downloadSongCell *weakCell = cell;
     cell.model.completeBlock = ^(NSError *error) {
@@ -68,6 +75,9 @@
         }else {
             [weakCell updataUI];
         }
+    };
+    cell.model.deleteCompleteBlock = ^{
+        [weakself.downloadTableView reloadData];
     };
     return cell;
 }
@@ -87,8 +97,24 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
+- (void)deleteCell:(deleteButon *)button {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:@"确定删除下载" preferredStyle:UIAlertControllerStyleAlert];
+    downloadSongModel *model = [[DPMusicDownLoadTool shareTool] downLoadingModelArray][button.indexPath.row];
+    UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"删除" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[DPMusicDownLoadTool shareTool] deleteDonwloadTaskWithModel:model];
+    }];
+    UIAlertAction *cancelfAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:nil];
+    [alertController addAction:deleteAction];
+    [alertController addAction:cancelfAction];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
 - (void)backCick {
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)newDownloadAdd {
+
 }
 
 - (NSMutableArray <downloadSongModel *>*)downloadModelArray {
@@ -98,5 +124,8 @@
     return _downloadModelArray;
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:DPMusicDownloadAddNew object:nil];
+}
 
 @end

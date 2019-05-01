@@ -22,6 +22,8 @@
 
 @property (nonatomic, strong) UITableView *lyricTableView;
 
+@property (nonatomic, strong) UIButton *lyricBtn;
+
 @property (nonatomic, strong) diskView *albumView;
 
 @property (nonatomic, strong) NSMutableArray *lyricArray;
@@ -68,6 +70,19 @@
         make.left.mas_equalTo(self.mas_left).offset(20);
         make.height.width.mas_equalTo(25);
     }];
+    
+    UIButton *lyricBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [lyricBtn setImage:[UIImage imageNamed:@"geci_white"] forState:UIControlStateNormal];
+    [lyricBtn addTarget:self action:@selector(lyricClick) forControlEvents:UIControlEventTouchUpInside];
+    lyricBtn.hidden = YES;
+    lyricBtn.alpha = 0;
+    [self addSubview:lyricBtn];
+    [lyricBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.mas_equalTo(self.mas_top).offset(20);
+        make.right.mas_equalTo(self.mas_right).offset(-20);
+        make.height.width.mas_equalTo(25);
+    }];
+    self.lyricBtn = lyricBtn;
     
     UILabel *songNmaeLabel = [[UILabel alloc] init];
     songNmaeLabel.textAlignment = NSTextAlignmentCenter;
@@ -168,6 +183,11 @@
     }
 }
     
+- (void)lyricClick {
+    if([self.delegate respondsToSelector:@selector(lyricBtnClick)]){
+        [self.delegate lyricBtnClick];
+    }
+}
 
 - (void)closeClick {
     if([self.delegate respondsToSelector:@selector(closeBtnClick)]){
@@ -179,8 +199,10 @@
     if(self.lyricTableView.hidden && !self.albumView.hidden) {
         [[playManager sharedPlay] setLastIsLyric:YES];
         self.lyricTableView.hidden = NO;
+        self.lyricBtn.hidden = NO;
         [UIView animateWithDuration:0.5 animations:^{
             self.lyricTableView.alpha = 1;
+            self.lyricBtn.alpha = 1;
             self.albumView.alpha = 0;
         } completion:^(BOOL finished) {
             self.albumView.hidden = YES;
@@ -195,8 +217,10 @@
         [UIView animateWithDuration:0.5 animations:^{
             self.albumView.alpha = 1;
             self.lyricTableView.alpha = 0;
+            self.lyricBtn.alpha = 0;
         } completion:^(BOOL finished) {
             self.lyricTableView.hidden = YES;
+            self.lyricBtn.hidden = YES;
         }];
     }
 }
@@ -287,6 +311,8 @@
     self.albumView.hidden = !temp;
     self.lyricTableView.alpha = 1;
     self.lyricTableView.hidden = temp;
+    self.lyricBtn.alpha = 1;
+    self.lyricBtn.hidden = temp;
 }
 
 //设置专辑图片

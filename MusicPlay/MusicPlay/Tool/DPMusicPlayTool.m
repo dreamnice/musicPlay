@@ -11,12 +11,14 @@
 
 @implementation DPMusicPlayTool
 
-+ (void)encodQQLyric:(NSString *)lyric complete:(void (^)(NSArray *timeArray, NSArray *lyricArray, NSString *baseLyric, BOOL isRoll))completeBlock {
++ (void)encodQQLyric:(NSString *)baseLyric complete:(void (^)(NSArray *timeArray, NSArray *lyricArray, NSString *baseLyric, BOOL isRoll))completeBlock {
     NSMutableArray *lyricArray = [NSMutableArray array];
     NSMutableArray *timeArray = [NSMutableArray array];
+    NSString *lyric = baseLyric;
     //判断是否滚动
     BOOL rollFlag = YES;
     if(lyric == nil || [lyric isEqualToString:@""]){
+        lyric = @"";
         NSString *lyricStr = @"未找到歌词";
         NSString *timeStr = @"0";
         rollFlag = NO;
@@ -96,7 +98,7 @@
         if(song.albumname == nil || [[song.albumname stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]length] == 0){
             return song.singerArray[0].name;
         }else{
-            return [NSString stringWithFormat:@"%@·%@",song.singerArray[0].name,song.albumname];
+            return [NSString stringWithFormat:@"%@ - %@",song.singerArray[0].name,song.albumname];
         }
     }else{
         return @"";
@@ -178,60 +180,92 @@
 }
 
 + (void)saveLastSongData:(songData *)data {
-    NSDictionary *dic = nil;
-    if(data.isDownload){
-        if(data.lyricObject){
-            dic = @{
-                    @"songmid"      : data.songmid,
-                    @"songid"       : data.songid,
-                    @"songname"     : data.songname,
-                    @"albumname"    : data.albumname,
-                    @"albummid"     : data.albummid,
-                    @"interval"     : [NSNumber numberWithInteger:data.interval],
-                    @"baseLyric"    : data.lyricObject.baseLyricl,
-                    @"singger"      : data.singerArray[0].name,
-                    @"isDownload"   : [NSNumber numberWithBool:YES],
-                    @"localFileURL" : data.localFileURL
-                    };
+    if(data){
+        NSDictionary *dic = nil;
+        if(data.isDownload){
+            if(data.lyricObject){
+                dic = @{
+                        @"songmid"      : data.songmid,
+                        @"songid"       : data.songid,
+                        @"songname"     : data.songname,
+                        @"albumname"    : data.albumname,
+                        @"albummid"     : data.albummid,
+                        @"interval"     : [NSNumber numberWithInteger:data.interval],
+                        @"baseLyric"    : data.lyricObject.baseLyricl,
+                        @"singger"      : data.singerArray[0].name,
+                        @"isDownload"   : [NSNumber numberWithBool:YES],
+                        @"localFileURL" : data.localFileURL
+                        };
+            }else{
+                dic = @{
+                        @"songmid"      : data.songmid,
+                        @"songid"       : data.songid,
+                        @"songname"     : data.songname,
+                        @"albumname"    : data.albumname,
+                        @"albummid"     : data.albummid,
+                        @"interval"     : [NSNumber numberWithInteger:data.interval],
+                        @"singger"      : data.singerArray[0].name,
+                        @"isDownload"   : [NSNumber numberWithBool:YES],
+                        @"localFileURL" : data.localFileURL
+                        };
+            }
         }else{
-            dic = @{
-                    @"songmid"      : data.songmid,
-                    @"songid"       : data.songid,
-                    @"songname"     : data.songname,
-                    @"albumname"    : data.albumname,
-                    @"albummid"     : data.albummid,
-                    @"interval"     : [NSNumber numberWithInteger:data.interval],
-                    @"singger"      : data.singerArray[0].name,
-                    @"isDownload"   : [NSNumber numberWithBool:YES],
-                    @"localFileURL" : data.localFileURL
-                    };
+            if(data.lyricObject){
+                dic = @{
+                        @"songmid"   : data.songmid,
+                        @"songid"    : data.songid,
+                        @"songname"  : data.songname,
+                        @"albumname" : data.albumname,
+                        @"albummid"  : data.albummid,
+                        @"interval"  : [NSNumber numberWithInteger:data.interval],
+                        @"baseLyric" : data.lyricObject.baseLyricl,
+                        @"singger"   : data.singerArray[0].name
+                        };
+            }else{
+                dic = @{
+                        @"songmid"   : data.songmid,
+                        @"songid"    : data.songid,
+                        @"songname"  : data.songname,
+                        @"albumname" : data.albumname,
+                        @"albummid"  : data.albummid,
+                        @"interval"  : [NSNumber numberWithInteger:data.interval],
+                        @"singger"   : data.singerArray[0].name
+                        };
+            }
         }
-    }else{
-        if(data.lyricObject){
-            dic = @{
-                    @"songmid"   : data.songmid,
-                    @"songid"    : data.songid,
-                    @"songname"  : data.songname,
-                    @"albumname" : data.albumname,
-                    @"albummid"  : data.albummid,
-                    @"interval"  : [NSNumber numberWithInteger:data.interval],
-                    @"baseLyric" : data.lyricObject.baseLyricl,
-                    @"singger"   : data.singerArray[0].name
-                    };
-        }else{
-            dic = @{
-                    @"songmid"   : data.songmid,
-                    @"songid"    : data.songid,
-                    @"songname"  : data.songname,
-                    @"albumname" : data.albumname,
-                    @"albummid"  : data.albummid,
-                    @"interval"  : [NSNumber numberWithInteger:data.interval],
-                    @"singger"   : data.singerArray[0].name
-                    };
-        }
+        [[NSUserDefaults standardUserDefaults] setObject:dic forKey:@"lastMusic"];
+        [[NSUserDefaults standardUserDefaults]  synchronize];
     }
-    [[NSUserDefaults standardUserDefaults] setObject:dic forKey:@"lastMusic"];
-    [[NSUserDefaults standardUserDefaults]  synchronize];
+}
+
+
++ (float)calculateFileSizeInUnit:(unsigned long long)contentLength {
+    if(contentLength >= pow(1024, 3))
+    return (float) (contentLength / (float)pow(1024, 3));
+    else if(contentLength >= pow(1024, 2))
+    return (float) (contentLength / (float)pow(1024, 2));
+    else if(contentLength >= 1024)
+    return (float) (contentLength / (float)1024);
+    else
+    return (float) (contentLength);
+}
+
++ (NSString *)calculateUnit:(unsigned long long)contentLength {
+    if(contentLength >= pow(1024, 3))
+    return @"G";
+    else if(contentLength >= pow(1024, 2))
+    return @"M";
+    else if(contentLength >= 1024)
+    return @"K";
+    else
+    return @"b";
+}
+
++ (NSString *)calculateFileSize:(unsigned long long)contentLength {
+    float siezInUnit = [DPMusicPlayTool calculateFileSizeInUnit:(unsigned long long)contentLength];
+    NSString *unit = [DPMusicPlayTool calculateUnit:(unsigned long long)contentLength];
+    NSString *writtenFileSize = [NSString stringWithFormat:@"%.1f%@",siezInUnit,unit];
+    return writtenFileSize;
 }
 
 @end

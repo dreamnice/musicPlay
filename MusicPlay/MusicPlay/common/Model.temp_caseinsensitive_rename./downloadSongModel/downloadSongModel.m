@@ -18,6 +18,15 @@
     return (CGFloat)_totalBytesWritten/_totalBytesExpectedToWrite;
 }
 
+- (NSString *)writtenFileSize {
+    return [DPMusicPlayTool calculateFileSize:self.totalBytesWritten];
+    
+}
+
+- (NSString *)totalFileSize {
+    return [DPMusicPlayTool calculateFileSize:self.totalBytesExpectedToWrite];
+}
+
 @end
 
 @implementation downloadSongModel

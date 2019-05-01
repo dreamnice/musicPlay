@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
                           failure:(DownLoadfailBlock)failure;
 
 - (void)cancelDownloadTaskWithModel:(downloadSongModel *)model;
+- (void)deleteDonwloadTaskWithModel:(downloadSongModel *)model;
 - (void)cancelAllDownloadTask;
 
 @end

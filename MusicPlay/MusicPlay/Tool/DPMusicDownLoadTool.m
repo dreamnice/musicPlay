@@ -91,6 +91,7 @@ static dispatch_once_t token;
         }];
     }else{
         NSURLSessionDownloadTask *downloadTask = [self AFDownLoadFileWithSongData:data  playURL:data.playURL addSuccessProgress:addComplete progress:progress success:success failure:failure];
+        [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicDownloadAddNew object:nil];
         [downloadTask resume];
     }
 }
@@ -109,7 +110,6 @@ static dispatch_once_t token;
         addComplete(NO, NO);
         DPResumeDataObject *resumObject = [[DPResumeDataObject alloc] initWithURLHost:url songData:data];
         [[DPRealmOperation shareOperation] addResumDataObject:resumObject];
-
         downloadSongModel *model = [[downloadSongModel alloc] initWithDPResumeDataObject:resumObject];
         [self.downLoadModelDic setValue:model forKey:model.URLHost];
         [self.downLoadingModelArray addObject:model];
@@ -185,11 +185,12 @@ static dispatch_once_t token;
                 failure(error, NO);
             }
         }else{
-
             if(filePath){
                 NSString *localFlieStr = [[filePath absoluteString] substringFromIndex:7];
                 data.localFileURL = localFlieStr;
                 data.isDownload = YES;
+                data.fileSize = [DPMusicPlayTool calculateFileSize:response.expectedContentLength];
+                data.fileSizeNum = response.expectedContentLength;
                 DPLocalMusicObject *object = [[DPLocalMusicObject alloc] initWithSongData:data localFileURL:[NSString stringWithFormat:@"/%@.m4a",data.songid]];
                 [[DPRealmOperation shareOperation] addLocalMusicObject:object];
                 if(success){
@@ -244,6 +245,8 @@ static dispatch_once_t token;
                 NSString *localFlieStr = [[filePath absoluteString] substringFromIndex:7];
                 model.songObject.localFileURL = localFlieStr;
                 model.songObject.isDownload = YES;
+                model.songObject.fileSize = [DPMusicPlayTool calculateFileSize:response.expectedContentLength];
+                model.songObject.fileSizeNum = response.expectedContentLength;
                 DPLocalMusicObject *object = [[DPLocalMusicObject alloc] initWithSongData:model.songObject localFileURL:[NSString stringWithFormat:@"/%@.m4a",model.songObject.songid]];
                 [[DPRealmOperation shareOperation] addLocalMusicObject:object];
             }
@@ -267,14 +270,27 @@ static dispatch_once_t token;
             if (error.code == -1001) {
                 NSLog(@"下载出错,看一下网络是否正常");
             }
-            NSData *resumeData = [error.userInfo objectForKey:@"NSURLSessionDownloadTaskResumeData"];
-            NSLog(@"接收%lld---期望接收%lld",task.countOfBytesReceived, task.countOfBytesExpectedToReceive);
-            [self saveHistoryWithTask:task downloadModel:model downloadTaskResumeData:resumeData];
+            if(model.isDeleteModel){
+                [self deleteHistoryWithKey:model.URLHost];
+                [self.downLoadingModelArray removeObject:model];
+                [self.downLoadModelDic removeObjectForKey:model.URLHost];
+                if(model){
+                    if(model.deleteCompleteBlock){
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            model.deleteCompleteBlock();
+                        });
+                    }
+                }
+            }else{
+                NSData *resumeData = [error.userInfo objectForKey:@"NSURLSessionDownloadTaskResumeData"];
+                NSLog(@"接收%lld---期望接收%lld",task.countOfBytesReceived, task.countOfBytesExpectedToReceive);
+                [self saveHistoryWithTask:task downloadModel:model downloadTaskResumeData:resumeData];
+            }
         }else{
             [self deleteHistoryWithKey:URLHost];
             [self.downLoadingModelArray removeObject:model];
             [self.downLoadModelDic removeObjectForKey:URLHost];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"downloadSuccess" object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicDownloadSuccess object:nil];
             model.downloadState = DPDonloadCompleteState;
         }
         if(model){
@@ -292,8 +308,32 @@ static dispatch_once_t token;
     if(model.downloadState == DPDonloadRunningState){
         model.downloadState = DPDonloadPauseState;
         [model.downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
-            
+    
         }];
+    }
+}
+
+- (void)deleteDonwloadTaskWithModel:(downloadSongModel *)model {
+    if(model){
+        if(model.downloadState != DPDonloadCompleteState){
+            if(model.downloadTask){
+                model.isDeleteModel = YES;
+                [model.downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
+                    
+                }];
+            }else{
+                [self deleteHistoryWithKey:model.URLHost];
+                [self.downLoadingModelArray removeObject:model];
+                [self.downLoadModelDic removeObjectForKey:model.URLHost];
+                if(model){
+                    if(model.deleteCompleteBlock){
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            model.deleteCompleteBlock();
+                        });
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -307,6 +347,7 @@ static dispatch_once_t token;
             
         }];
     }
+
 }
 
 - (void)saveHistoryWithTask:(NSURLSessionDownloadTask *)task downloadModel:(downloadSongModel *)model downloadTaskResumeData:(NSData *)data {
@@ -319,6 +360,7 @@ static dispatch_once_t token;
     model.progress.totalBytesWritten = task.countOfBytesReceived;
     DPResumeDataObject *object = [[DPResumeDataObject alloc] initWithdownloadSongMode:model];
     [[DPRealmOperation shareOperation] addResumDataObject:object];
+    model.downloadTask = nil;
 }
 
 - (void)deleteHistoryWithKey:(NSString *)host {

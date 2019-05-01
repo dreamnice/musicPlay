@@ -18,8 +18,6 @@
 
 @property (nonatomic, strong) tabbarView *myTabbarView;
 
-@property (nonatomic, strong) CADisplayLink *link;
-
 @end
 
 @implementation mainTabbarController
@@ -67,13 +65,13 @@
 //歌曲切换
 - (void)songChange {
     self.data = [[playManager sharedPlay] songData];
+    /*
+     0x7ff2fe168320
+     */
     [self.myTabbarView setAlbumImageWithURL:[NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.data.albummid]];
     [self.myTabbarView setSongName:self.data.songname];
     [self.myTabbarView setNextText:self.data.singerArray[0].name];
     lastLyric = @"";
-    if(self.link.isPaused){
-        [self.link setPaused:NO];
-    }
 }
 
 - (void)songPlay {
@@ -81,18 +79,14 @@
         [self.myTabbarView setNextText:lastLyric];
     }
     [self.myTabbarView changePlayBtnPlay:YES];
-    if(self.link.isPaused){
-        [self.link setPaused:NO];
-    }
+    [self.myTabbarView setImageAnimation:YES];
 }
 
 - (void)songPause {
     lastLyric = [self.myTabbarView getNextText];
     [self.myTabbarView setNextText:self.data.singerArray[0].name];
     [self.myTabbarView changePlayBtnPlay:NO];
-    if(!self.link.isPaused){
-        [self.link setPaused:YES];
-    }
+    [self.myTabbarView setImageAnimation:NO];
 }
 
 - (void)lyricSearch:(NSNotification *)notification {
@@ -125,20 +119,6 @@
     }
 }
 
-- (void)rollImageView {
-    CGFloat angle = self.link.duration * M_1_PI;
-    [self.myTabbarView setAlbumImageAngle:angle];
-}
-
-- (CADisplayLink *)link {
-    if(!_link){
-        _link = [CADisplayLink displayLinkWithTarget:self selector:@selector(rollImageView)];
-        [_link setPaused:YES];
-        [_link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-    }
-    return _link;
-}
-
 - (NSString *)lyricStrWithValue:(float)value {
     if(self.data.lyricObject.isRoll){
         for(NSInteger i = 0; i <= self.data.lyricObject.timeArray.count - 1; i++){
@@ -159,6 +139,6 @@
 }
 
 - (void)dealloc {
-    [self.link removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+
 }
 @end

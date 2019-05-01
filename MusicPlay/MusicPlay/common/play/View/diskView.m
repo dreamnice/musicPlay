@@ -37,8 +37,8 @@
         make.centerY.equalTo(self);
         make.height.width.mas_equalTo(ScreenW - 80.0f);
     }];
-    
     [self.diskView addSubview:self.albumView];
+    
     CGFloat imgWH = ScreenW - 80.0f - 100.0f;
     [self.albumView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.center.equalTo(self.diskView);

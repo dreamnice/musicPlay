@@ -33,7 +33,7 @@
     if(self){
         searchBar.delegate = self;
         //下载成功重新刷新界面
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadSuccess) name:@"downloadSuccess" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadSuccess) name:DPMusicDownloadSuccess object:nil];
     }
     return self;
 }
@@ -151,6 +151,7 @@
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
     [searchBar resignFirstResponder];
     [self.songDataArray removeAllObjects];
+    [self.resultTableView.mj_footer setState:MJRefreshStateNoMoreData];
     [self.resultTableView reloadData];
     searchBar.text = @"";
     [searchBar setShowsCancelButton:NO animated:YES];
@@ -171,7 +172,7 @@
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"downloadSuccess" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:DPMusicDownloadSuccess object:nil];
 }
 
 @end

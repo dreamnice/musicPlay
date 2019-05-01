@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)closeBtnClick;
 
+- (void)lyricBtnClick;
+
 @end
 
 @interface musicInfoView : UIView

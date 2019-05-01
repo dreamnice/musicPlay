@@ -18,6 +18,9 @@
 		DF1184282278B32E00A0D2CD /* homeInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1184272278B32E00A0D2CD /* homeInfoView.m */; };
 		DF11842C2278C80000A0D2CD /* localSongTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DF11842A2278C80000A0D2CD /* localSongTableViewCell.m */; };
 		DF11842D2278C80000A0D2CD /* localSongTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF11842B2278C80000A0D2CD /* localSongTableViewCell.xib */; };
+		DF1184302279A10000A0D2CD /* deleteButon.m in Sources */ = {isa = PBXBuildFile; fileRef = DF11842F2279A10000A0D2CD /* deleteButon.m */; };
+		DF1184332279BBED00A0D2CD /* tabbarDiskView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1184322279BBED00A0D2CD /* tabbarDiskView.m */; };
+		DF1184362279E5AD00A0D2CD /* tabbarLyricView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1184352279E5AD00A0D2CD /* tabbarLyricView.m */; };
 		DF1AE2492254D2AC0015ABFF /* musicControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1AE2482254D2AC0015ABFF /* musicControlView.m */; };
 		DF1C3F6E21F39A1F0049DB4B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F6D21F39A1F0049DB4B /* AppDelegate.m */; };
 		DF1C3F7121F39A1F0049DB4B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF1C3F7021F39A1F0049DB4B /* ViewController.m */; };
@@ -44,7 +47,6 @@
 		DF310ECA2274604F0043CA37 /* diskView.m in Sources */ = {isa = PBXBuildFile; fileRef = DF310EC92274604F0043CA37 /* diskView.m */; };
 		DF60A2DF223A9F7100FF0991 /* playViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DF60A2DD223A9F7100FF0991 /* playViewController.m */; };
 		DF60A2E0223A9F7100FF0991 /* playViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF60A2DE223A9F7100FF0991 /* playViewController.xib */; };
-		DF8B018622539681002C3FE3 /* baseSevice.m in Sources */ = {isa = PBXBuildFile; fileRef = DF8B018522539681002C3FE3 /* baseSevice.m */; };
 		DF935FBC2239409D00DFA8CD /* playManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DF935FBB2239409D00DFA8CD /* playManager.m */; };
 		DF93FE27223E1D7C004D819E /* songData.m in Sources */ = {isa = PBXBuildFile; fileRef = DF93FE26223E1D7C004D819E /* songData.m */; };
 		DF93FE2A223E22EB004D819E /* singerData.m in Sources */ = {isa = PBXBuildFile; fileRef = DF93FE29223E22EB004D819E /* singerData.m */; };
@@ -98,6 +100,12 @@
 		DF1184292278C80000A0D2CD /* localSongTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = localSongTableViewCell.h; sourceTree = "<group>"; };
 		DF11842A2278C80000A0D2CD /* localSongTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = localSongTableViewCell.m; sourceTree = "<group>"; };
 		DF11842B2278C80000A0D2CD /* localSongTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = localSongTableViewCell.xib; sourceTree = "<group>"; };
+		DF11842E2279A10000A0D2CD /* deleteButon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = deleteButon.h; sourceTree = "<group>"; };
+		DF11842F2279A10000A0D2CD /* deleteButon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = deleteButon.m; sourceTree = "<group>"; };
+		DF1184312279BBED00A0D2CD /* tabbarDiskView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabbarDiskView.h; sourceTree = "<group>"; };
+		DF1184322279BBED00A0D2CD /* tabbarDiskView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabbarDiskView.m; sourceTree = "<group>"; };
+		DF1184342279E5AD00A0D2CD /* tabbarLyricView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabbarLyricView.h; sourceTree = "<group>"; };
+		DF1184352279E5AD00A0D2CD /* tabbarLyricView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabbarLyricView.m; sourceTree = "<group>"; };
 		DF1AE2472254D2AC0015ABFF /* musicControlView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = musicControlView.h; sourceTree = "<group>"; };
 		DF1AE2482254D2AC0015ABFF /* musicControlView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = musicControlView.m; sourceTree = "<group>"; };
 		DF1C3F6921F39A1F0049DB4B /* MusicPlay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicPlay.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -143,8 +151,6 @@
 		DF60A2DC223A9F7100FF0991 /* playViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = playViewController.h; sourceTree = "<group>"; };
 		DF60A2DD223A9F7100FF0991 /* playViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = playViewController.m; sourceTree = "<group>"; };
 		DF60A2DE223A9F7100FF0991 /* playViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = playViewController.xib; sourceTree = "<group>"; };
-		DF8B018422539681002C3FE3 /* baseSevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = baseSevice.h; sourceTree = "<group>"; };
-		DF8B018522539681002C3FE3 /* baseSevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = baseSevice.m; sourceTree = "<group>"; };
 		DF935FBA2239409D00DFA8CD /* playManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = playManager.h; sourceTree = "<group>"; };
 		DF935FBB2239409D00DFA8CD /* playManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = playManager.m; sourceTree = "<group>"; };
 		DF93FE23223E1921004D819E /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
@@ -396,6 +402,8 @@
 				DF0DE8B422452539009AD610 /* songTableViewCell.xib */,
 				DF1184262278B32E00A0D2CD /* homeInfoView.h */,
 				DF1184272278B32E00A0D2CD /* homeInfoView.m */,
+				DF11842E2279A10000A0D2CD /* deleteButon.h */,
+				DF11842F2279A10000A0D2CD /* deleteButon.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -471,15 +479,13 @@
 		DF935FB322393DFA00DFA8CD /* common */ = {
 			isa = PBXGroup;
 			children = (
-				DF283C032270A8310012D5B1 /* Model */,
-				DF11840822758EFC00A0D2CD /* mainNavigation */,
-				DFA6C46D2270F24B00AB3CBA /* mainTabbar */,
-				DF283C022270A8250012D5B1 /* main */,
-				DF60A2D8223A9F0F00FF0991 /* play */,
 				DF935FBA2239409D00DFA8CD /* playManager.h */,
 				DF935FBB2239409D00DFA8CD /* playManager.m */,
-				DF8B018422539681002C3FE3 /* baseSevice.h */,
-				DF8B018522539681002C3FE3 /* baseSevice.m */,
+				DF283C032270A8310012D5B1 /* Model */,
+				DFA6C46D2270F24B00AB3CBA /* mainTabbar */,
+				DF11840822758EFC00A0D2CD /* mainNavigation */,
+				DF283C022270A8250012D5B1 /* main */,
+				DF60A2D8223A9F0F00FF0991 /* play */,
 			);
 			path = common;
 			sourceTree = "<group>";
@@ -510,6 +516,10 @@
 			children = (
 				DFA6C4742270F49200AB3CBA /* tabbarView.h */,
 				DFA6C4752270F49200AB3CBA /* tabbarView.m */,
+				DF1184312279BBED00A0D2CD /* tabbarDiskView.h */,
+				DF1184322279BBED00A0D2CD /* tabbarDiskView.m */,
+				DF1184342279E5AD00A0D2CD /* tabbarLyricView.h */,
+				DF1184352279E5AD00A0D2CD /* tabbarLyricView.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -769,8 +779,9 @@
 				DFA6C4762270F49200AB3CBA /* tabbarView.m in Sources */,
 				DF1C3F7121F39A1F0049DB4B /* ViewController.m in Sources */,
 				DF22A1FA2274E8EA00AD56DE /* downloadSongModel.m in Sources */,
-				DF8B018622539681002C3FE3 /* baseSevice.m in Sources */,
+				DF1184302279A10000A0D2CD /* deleteButon.m in Sources */,
 				DF1AE2492254D2AC0015ABFF /* musicControlView.m in Sources */,
+				DF1184332279BBED00A0D2CD /* tabbarDiskView.m in Sources */,
 				DFA6C4792270FE1200AB3CBA /* DPMusicPlayTool.m in Sources */,
 				DF93FE2A223E22EB004D819E /* singerData.m in Sources */,
 				DF0DE8B522452539009AD610 /* songTableViewCell.m in Sources */,
@@ -787,6 +798,7 @@
 				DF283C0D2270A98D0012D5B1 /* homePageViewController.m in Sources */,
 				DF11840B22758F2800A0D2CD /* mainNavigationController.m in Sources */,
 				DF1184282278B32E00A0D2CD /* homeInfoView.m in Sources */,
+				DF1184362279E5AD00A0D2CD /* tabbarLyricView.m in Sources */,
 				DF935FBC2239409D00DFA8CD /* playManager.m in Sources */,
 				DFA6C47C227195E500AB3CBA /* DPMusicHttpTool.m in Sources */,
 				DF1C3F7C21F39A200049DB4B /* main.m in Sources */,

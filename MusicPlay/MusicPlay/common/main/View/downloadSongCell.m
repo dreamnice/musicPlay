@@ -49,13 +49,23 @@
 }
 
 - (void)setupUI {
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"cm2_default_cover_80"]];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"guangpan"]];
     [self.contentView addSubview:imageView];
     [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(self.contentView).offset(15);
         make.centerY.mas_equalTo(self.contentView);
         make.height.width.mas_equalTo(20);
     }];
+    
+    deleteButon *deleteBtn = [deleteButon buttonWithType:UIButtonTypeCustom];
+    [deleteBtn setImage:[UIImage imageNamed:@"lajitong"] forState:UIControlStateNormal];
+    [self.contentView addSubview:deleteBtn];
+    [deleteBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(self.contentView.mas_right).offset(-15);
+        make.centerY.mas_equalTo(self.contentView);
+        make.height.width.mas_equalTo(30);
+    }];
+    self.deleteBtn = deleteBtn;
     
     UILabel *songNameLabel = [[UILabel alloc] init];
     [self.contentView addSubview:songNameLabel];
@@ -64,7 +74,7 @@
         make.top.equalTo(self.contentView.mas_top).with.offset(5);
         make.left.equalTo(self.contentView.mas_left).with.offset(45);
         make.height.mas_equalTo(20);
-        make.width.mas_equalTo(300);
+        make.width.mas_equalTo(270);
     }];
     self.songNameLabel = songNameLabel;
     
@@ -77,20 +87,35 @@
         make.top.equalTo(songNameLabel.mas_bottom).offset(6.5);
         make.left.mas_equalTo(self.contentView.mas_left).offset(45);
         make.height.mas_equalTo(20);
-        make.width.mas_equalTo(300);
+        make.width.mas_equalTo(270);
     }];
     self.pauseLabel = pauseLabel;
     
-    UIProgressView *downloadProgressViewr = [[UIProgressView alloc] init];
-    downloadProgressViewr.userInteractionEnabled = NO;
-    [self.contentView addSubview:downloadProgressViewr];
-    [downloadProgressViewr mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerY.equalTo(pauseLabel);
+    UILabel *fileSizeProgressLabel = [[UILabel alloc] init];
+    fileSizeProgressLabel.font = [UIFont systemFontOfSize:12];
+    [fileSizeProgressLabel setTextColor:albumNameColor];
+    fileSizeProgressLabel.text =  @"0.0M / 0.0M";
+    [self.contentView addSubview:fileSizeProgressLabel];
+    [fileSizeProgressLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(songNameLabel.mas_bottom).offset(6.5);
         make.left.mas_equalTo(self.contentView.mas_left).offset(45);
-        make.right.mas_equalTo(self.contentView.mas_right).offset(-50);
-        make.height.mas_equalTo(5);
+        make.height.mas_equalTo(20);
+        make.width.mas_equalTo(80);
     }];
-    self.downloadProgressView = downloadProgressViewr;
+    self.fileSizeProgressLabel = fileSizeProgressLabel;
+    
+    UIProgressView *downloadProgressView = [[UIProgressView alloc] init];
+    [downloadProgressView setProgressTintColor:[UIColor colorWithRed:76/255.0 green:164/255.0 blue:224/255.0 alpha:1]];
+    [downloadProgressView setTrackTintColor:[UIColor colorWithRed:235/255.0 green:235/255.0 blue:235/255.0 alpha:1]];
+    downloadProgressView.userInteractionEnabled = NO;
+    [self.contentView addSubview:downloadProgressView];
+    [downloadProgressView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(pauseLabel);
+        make.left.mas_equalTo(fileSizeProgressLabel.mas_right).offset(3);
+        make.right.mas_equalTo(self.contentView.mas_right).offset(-60);
+        make.height.mas_equalTo(3);
+    }];
+    self.downloadProgressView = downloadProgressView;
 }
 
 - (void)updataUI {
@@ -105,6 +130,7 @@
     model.progressBlock = ^(CGFloat progress) {
         if(weakCell.model == model){
             weakCell.downloadProgressView.progress = weakModel.progress.progress;
+            weakCell.fileSizeProgressLabel.text = [NSString stringWithFormat:@"%@ / %@",weakModel.progress.writtenFileSize, weakModel.progress.totalFileSize];
         }
     };
     model.beiginBlock = ^{
@@ -116,12 +142,15 @@
     self.songNameLabel.text = model.songObject.songname;
     if(model.downloadState == DPDonloadPauseState){
         self.downloadProgressView.hidden = YES;
+        self.fileSizeProgressLabel.hidden = YES;
         self.pauseLabel.hidden = NO;
     }else if(model.downloadState == DPDonloadRunningState){
         self.downloadProgressView.hidden = NO;
+        self.fileSizeProgressLabel.hidden = NO;
         self.pauseLabel.hidden = YES;
     }
     self.downloadProgressView.progress = model.progress.progress;
+    self.fileSizeProgressLabel.text = [NSString stringWithFormat:@"%@ / %@",model.progress.writtenFileSize, model.progress.totalFileSize];
 }
 
 

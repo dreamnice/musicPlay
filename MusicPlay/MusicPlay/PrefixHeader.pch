@@ -15,7 +15,6 @@
 #import <UIImageView+WebCache.h>
 
 #import "playManager.h"
-#import "baseSevice.h"
 #import "DPMusicPlayTool.h"
 #import "DPMusicHttpTool.h"
 
@@ -40,9 +39,11 @@ typedef void (^DownLoadfailBlock)(NSError *error, BOOL inDownloadQueue);
 typedef void (^DowningProgress)(CGFloat progress);
 typedef void (^DowningComplete)(NSError *error);
 typedef void (^DowningBeigin)();
-/*
- NSString * const DPMusicNext = @"music_next";
- NSString * const DPMusiclast = @"music_last";
- */
+typedef void (^DeleteComplete)();
+
+ static NSString * const DPMusicDownloadAddNew = @"musicDownload_add";
+ static NSString * const DPMusicDownloadSuccess = @"musicDownload_success";
+ static NSString * const DPMusicDelete = @"musicDelete";
+
 #endif /* PrefixHeader_pch */
 

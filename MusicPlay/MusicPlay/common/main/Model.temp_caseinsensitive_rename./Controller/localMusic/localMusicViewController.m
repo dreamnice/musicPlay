@@ -28,7 +28,7 @@
     if(self){
         self.title = @"本地歌曲";
         //下载成功重新刷新界面
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadSuccess) name:@"downloadSuccess" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadSuccess) name:DPMusicDownloadSuccess object:nil];
         RLMResults <DPLocalMusicObject *>*result = [[DPRealmOperation shareOperation] queryDownLoadSongData];
         NSLog(@"%ld",result.count);
         for(NSInteger i = 0; i < result.count; i++){
@@ -78,7 +78,7 @@
     }else{
         cell = [localSongTableViewCell cellWithTableView:tableView isFirstCell:NO];
         cell.songNameLabel.text = self.songDataArray[indexPath.row - 1].songname;
-        cell.singerAndAlbumLabel.text = [DPMusicPlayTool getSingerAndAlbumTxt:self.songDataArray[indexPath.row - 1]];
+        cell.singerAndAlbumLabel.text = [NSString stringWithFormat:@"%@ %@",self.songDataArray[indexPath.row - 1].fileSize ,[DPMusicPlayTool getSingerAndAlbumTxt:self.songDataArray[indexPath.row - 1]]];
     }
     return cell;
 }
@@ -100,20 +100,33 @@
     NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
     NSString *path = [cachesPath stringByAppendingString:self.songDataArray[indexPath.row - 1].localFileURL];
     [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    self.songDataArray[indexPath.row - 1].isDownload = NO;
+    self.songDataArray[indexPath.row - 1].localFileURL = nil;
+    self.songDataArray[indexPath.row - 1].fileSizeNum = 0;
+    self.songDataArray[indexPath.row - 1].fileSize = nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicDelete object:self.songDataArray[indexPath.row - 1].songid];
     [self.songDataArray removeObjectAtIndex:indexPath.row - 1];
     [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-}
 
+}
+/*
+   0x7ff2fe168320
+ */
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
     return @"删除";
 }
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if(indexPath.row == 0){
         downloadingViewController *vc = [[downloadingViewController alloc] init];
         [self.navigationController pushViewController:vc animated:YES];
     }else{
-        playViewController *vc = [[playViewController alloc] initWithSongData:self.songDataArray[indexPath.row - 1] isFromTabbar:NO];
+        /*
+         0x7ff2fe168320
+         */
+        songData *songData = self.songDataArray[indexPath.row - 1];
+        playViewController *vc = [[playViewController alloc] initWithSongData:songData isFromTabbar:NO];
         [[playManager sharedPlay] getSongList:self.songDataArray currentIndex:indexPath.row - 1];
         [self presentViewController:vc animated:YES completion:nil];
     }
@@ -142,7 +155,7 @@
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"downloadSuccess" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:DPMusicDownloadSuccess object:nil];
 }
 
 @end

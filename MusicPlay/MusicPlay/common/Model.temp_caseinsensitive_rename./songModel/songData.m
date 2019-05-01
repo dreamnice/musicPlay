@@ -48,6 +48,8 @@
         self.interval = object.interval;
         self.isDownload = object.isDownload;
         self.playURL = object.playURL;
+        self.fileSize = object.fileSize;
+        self.fileSizeNum = object.fileSizeNum;
         singerData *data = [[singerData alloc] init];
         data.name = object.singer;
         if(data.name == nil || [data.name isEqualToString:@""]){

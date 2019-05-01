@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)playaStateChangeClick;
 
-- (void)downloadSongClick;
+- (void)downloadSongClick:(UIButton *)btn;
 
 - (void)songProgressClick;
 

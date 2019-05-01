@@ -27,7 +27,6 @@
     self = [super init];
     if(self){
         //下载成功重新刷新界面
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadSuccess) name:@"downloadSuccess" object:nil];
         __weak __typeof__(self) weakself = self;
         switch (musicType) {
                 case DPTopMusicType:
@@ -121,7 +120,7 @@
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"downloadSuccess" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:DPMusicDownloadSuccess object:nil];
 }
 
 @end

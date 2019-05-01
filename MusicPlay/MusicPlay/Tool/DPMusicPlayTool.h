@@ -13,7 +13,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DPMusicPlayTool : NSObject
 
 //解析歌词
-+ (void)encodQQLyric:(NSString *)lyric complete:(void (^)(NSArray *timeArray, NSArray *lyricArray, NSString *baseLyric, BOOL isRoll))completeBlock ;
++ (void)encodQQLyric:(NSString *)baseLyric complete:(void (^)(NSArray *timeArray, NSArray *lyricArray, NSString *baseLyric, BOOL isRoll))completeBlock;
+
++ (float)calculateFileSizeInUnit:(unsigned long long)contentLength;
+
++ (NSString *)calculateUnit:(unsigned long long)contentLength;
+
++ (NSString *)calculateFileSize:(unsigned long long)contentLength;
 
 //解析歌手名+专辑名
 + (NSString *)getSingerAndAlbumTxt:(songData *)song;

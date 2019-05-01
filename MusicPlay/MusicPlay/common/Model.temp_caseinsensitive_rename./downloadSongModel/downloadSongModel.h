@@ -56,7 +56,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) DowningBeigin beiginBlock;
 
+@property (nonatomic, copy) DeleteComplete deleteCompleteBlock;
+
 @property (nonatomic, strong) NSURLSessionDownloadTask *downloadTask;
+
+@property (nonatomic, assign) BOOL isDeleteModel;
 
 @end
 

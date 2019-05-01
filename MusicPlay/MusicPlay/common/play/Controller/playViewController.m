@@ -26,12 +26,6 @@
 
 @property (nonatomic, strong) musicInfoView *infoView;
 
-@property (nonatomic, strong) NSMutableArray *lyricArray;
-
-@property (nonatomic, strong) NSMutableArray *timeArray;
-
-@property (nonatomic, assign) BOOL LyricRoll;
-
 @property (nonatomic, assign) BOOL isTabbar;
 
 @end
@@ -54,7 +48,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteControlProgress:) name:DPMusicRemoteChange object:index];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(songTotalTimeChange) name:DPMusicTotalTimeChange object:nil];
         self.isTabbar = isTabbar;
-        if([[[playManager sharedPlay] songData].songid isEqualToString:song.songid]){
+        if(song.isLastSong){
             self.isTabbar = YES;
         }
     }
@@ -68,11 +62,7 @@
 
 - (void)setInterface {
     self.view.backgroundColor = [UIColor blackColor];
-//    UIScreenEdgePanGestureRecognizer *edgePan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(interactiveTransitionRecognizerAction:)];
-//    // 可以拓展为其它侧边滑动手势（如：右侧边滑动进行present...）
-//    edgePan.edges = UIRectEdgeLeft;
-//    [self.view addGestureRecognizer:edgePan];
-    
+
     musicInfoView *infoView = [[musicInfoView alloc] initWithFrame:CGRectMake(0, keyWindowsafeAreaInsets.top, ScreenW, ScreenH - 180 - keyWindowsafeAreaInsets.top) isTabbar:self.isTabbar];
     infoView.backgroundColor = [UIColor blackColor];
     infoView.delegate = self;
@@ -88,9 +78,6 @@
     playManager *manager = [playManager sharedPlay];
     if(self.isTabbar){
         if(!self.songData.isLastSong){
-            self.timeArray = [self.songData.lyricObject.timeArray mutableCopy];
-            self.lyricArray = [self.songData.lyricObject.lyricArray mutableCopy];
-            self.LyricRoll = self.songData.lyricObject.isRoll;
             [self.controlView setSongProgressValue:manager.currentTime/self.songData.interval animated:YES];
             [self.infoView loadTimeArray:self.songData.lyricObject.timeArray lyricArray:self.songData.lyricObject.lyricArray isRoll:self.songData.lyricObject.isRoll];
             [self.infoView setTabbrValue:manager.currentTime];
@@ -127,6 +114,17 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void)lyricBtnClick {
+    [self.infoView removeTimeAndLyricArray];
+    [self.infoView loadTimeArray:@[@"0"] lyricArray:@[@"正在搜索歌词...."] isRoll:NO];
+    [[DPMusicHttpTool shareTool] getLyricWithSongData:self.songData complete:^(lyricModel * _Nonnull lyric) {
+        playManager *manager = [playManager sharedPlay];
+        [self.infoView removeTimeAndLyricArray];
+        [self.infoView loadTimeArray:self.songData.lyricObject.timeArray lyricArray:self.songData.lyricObject.lyricArray isRoll:self.songData.lyricObject.isRoll];
+        [self.infoView lyricTableViewScrollWithValue:manager.currentTime animated:NO];
+    }];
+}
+
 #pragma mark - musicControlViewDelegate
 - (void)closeClick {
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -153,8 +151,8 @@
     [self.controlView changePlayTypeBtn:[[playManager sharedPlay] playState]];
 }
 
-- (void)downloadSongClick {
-    [self downBtnClick:self.songData];
+- (void)downloadSongClick:(UIButton *)btn {
+    [self downBtnClick:self.songData downLoadButon:btn];
 }
 
 - (void)songProgressClick {
@@ -171,8 +169,10 @@
     [self.controlView setLeftLabelText:self.songData.interval * value];
 }
 
-- (void)downBtnClick:(songData *)data {
+- (void)downBtnClick:(songData *)data downLoadButon:(UIButton *)btn {
+    btn.enabled = NO;
     if(data.isDownload){
+        btn.enabled = YES;
         [self showAlertWihtMessage:@"歌曲已下载过"];
     }
     NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
@@ -185,6 +185,7 @@
         }else{
             [self showAlertWihtMessage:@"获取下载地址失败"];
         }
+        btn.enabled = YES;
     } progress:nil success:nil failure:nil];
 }
 
@@ -266,34 +267,16 @@
     [self adjustLyricToCurrentTime:currentTime];
 }
 
-//// MARK: - 侧滑Dismiss
-//- (void)interactiveTransitionRecognizerAction:(UIScreenEdgePanGestureRecognizer *)sender {
-//    if (sender.state == UIGestureRecognizerStateBegan){
-//        // 可以此处可以做出判断是需要执行Dismiss操作还是Pop操作
-//        // 此处以Dismiss为列
-//        [self dismissViewControllerAnimated:YES completion:nil];
-//    }
-//}
-
 - (void)showAlertWihtMessage:(NSString *)message {
     [MBProgressHUD showMessage:message];
 }
 
+//设置状态栏为白色
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
 #pragma mark - 懒加载
-- (NSMutableArray *)lyricArray {
-    if(!_lyricArray){
-        _lyricArray = [NSMutableArray array];
-    }
-    return _lyricArray;
-}
-
-- (NSMutableArray *)timeArray {
-    if(!_timeArray){
-        _timeArray = [NSMutableArray array];
-    }
-    return _timeArray;
-}
-
 - (void)dealloc {
     NSLog(@"播放界面销毁了");
     [[NSNotificationCenter defaultCenter] removeObserver:self];

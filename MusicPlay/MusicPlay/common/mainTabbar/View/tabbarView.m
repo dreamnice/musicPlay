@@ -7,14 +7,15 @@
 //
 
 #import "tabbarView.h"
+#import "tabbarDiskView.h"
+#import "tabbarLyricView.h"
 
+#import <Masonry.h>
 @interface tabbarView()
 
-@property (nonatomic, strong) UILabel *songNameLabel;
+@property (nonatomic, strong) tabbarLyricView *lyricView;
 
-@property (nonatomic, strong) UILabel *nextLabel;
-
-@property (nonatomic, strong) UIImageView *albumImageView;
+@property (nonatomic, strong) tabbarDiskView *albumImageView;
 
 @property (nonatomic, strong) UIButton *playBtn;
 
@@ -31,28 +32,24 @@
 }
 
 - (void)setInterface {
-    UILabel *songNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(60, 8, 200, 15)];
-    self.songNameLabel = songNameLabel;
-    [self addSubview:songNameLabel];
-    songNameLabel.font = [UIFont systemFontOfSize:13];
+    tabbarDiskView *albumImageView = [[tabbarDiskView alloc]init];
+    [self addSubview:albumImageView];
+    [albumImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(self.mas_left).offset(10);
+        make.centerY.mas_equalTo(self);
+        make.height.width.mas_equalTo(45);
+    }];
+    self.albumImageView = albumImageView;
 
-    UILabel *nextLabel = [[UILabel alloc] initWithFrame:CGRectMake(60, 26, 200, 15)];
-    nextLabel.font = [UIFont systemFontOfSize:12];
-    [self addSubview:nextLabel];
-    self.nextLabel = nextLabel;
-    
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(10, 5, 39, 39)];
-    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:imageView.bounds byRoundingCorners:UIRectCornerAllCorners cornerRadii:imageView.bounds.size];
-    CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
-    //设置大小
-    maskLayer.frame = imageView.bounds;
-    //设置图形样子
-    maskLayer.path = maskPath.CGPath;
-    imageView.layer.mask = maskLayer;
-    imageView.image = [UIImage imageNamed:@"cm2_default_cover_fm"];
-    [self addSubview:imageView];
-    self.albumImageView = imageView;
-    
+    tabbarLyricView *lyricView = [[tabbarLyricView alloc] init];
+    [self addSubview:lyricView];
+    [lyricView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.mas_equalTo(albumImageView);
+        make.left.mas_equalTo(albumImageView.mas_right).offset(8);
+        make.right.mas_equalTo(self.mas_right).offset(-60);
+        make.height.mas_equalTo(35);
+    }];
+    self.lyricView = lyricView;
     UIButton *playBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     playBtn.frame = CGRectMake(ScreenW - 49, 5, 39, 39);
     [playBtn setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
@@ -60,6 +57,11 @@
     [playBtn addTarget:self action:@selector(buttonTouchDown:) forControlEvents:UIControlEventTouchDown];
     [playBtn addTarget:self action:@selector(buttonTouchUpOutside:) forControlEvents:UIControlEventTouchUpOutside];
     [self addSubview:playBtn];
+    [playBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(self.mas_right).offset(-15);
+        make.centerY.mas_equalTo(self);
+        make.width.height.mas_equalTo(40);
+    }];
     self.playBtn = playBtn;
     
     UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTap)];
@@ -67,19 +69,23 @@
 }
 
 - (void)setSongName:(NSString *)songName {
-    self.songNameLabel.text = songName;
+    self.lyricView.songNameLabel.text = songName;
 }
 
 - (void)setNextText:(NSString *)text {
-    self.nextLabel.text = text;
+    self.lyricView.nextLabel.text = text;
 }
 
 - (void)setAlbumImageWithURL:(NSString *)url {
-    [self.albumImageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"cm2_default_cover_fm"]];
+    [self.albumImageView setImageWithURL:url];
 }
 
 - (void)setAlbumImageAngle:(CGFloat)angle {
     self.albumImageView.transform = CGAffineTransformRotate(self.albumImageView.transform, angle);
+}
+
+- (void)setImageAnimation:(BOOL)animation {
+    [self.albumImageView setImageAnimation:animation];
 }
 
 - (void)changePlayBtnPlay:(BOOL)isplay {
@@ -113,6 +119,6 @@
 }
 
 - (NSString *)getNextText {
-    return self.nextLabel.text;
+    return self.lyricView.nextLabel.text;
 }
 @end

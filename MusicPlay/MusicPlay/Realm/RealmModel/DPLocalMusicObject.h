@@ -35,6 +35,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSString *localFileURL;
 
+@property NSString *fileSize;
+
+@property int64_t fileSizeNum;
+
 @property BOOL isDownload;
 
 @property DPLocalLyricObject *lyricObject;

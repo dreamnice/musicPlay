@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)changePlayBtnPlay:(BOOL)isplay;
 
+- (void)setImageAnimation:(BOOL)animation;
+
 @end
 
 NS_ASSUME_NONNULL_END
