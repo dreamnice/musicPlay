@@ -186,8 +186,7 @@ static dispatch_once_t token;
             }
         }else{
             if(filePath){
-                NSString *localFlieStr = [[filePath absoluteString] substringFromIndex:7];
-                data.localFileURL = localFlieStr;
+                data.localFileURL = [NSString stringWithFormat:@"/%@.m4a",data.songid];
                 data.isDownload = YES;
                 data.fileSize = [DPMusicPlayTool calculateFileSize:response.expectedContentLength];
                 data.fileSizeNum = response.expectedContentLength;
@@ -242,8 +241,7 @@ static dispatch_once_t token;
             }
         }else{
             if(filePath){
-                NSString *localFlieStr = [[filePath absoluteString] substringFromIndex:7];
-                model.songObject.localFileURL = localFlieStr;
+                model.songObject.localFileURL = [NSString stringWithFormat:@"/%@.m4a",model.songObject.songid];
                 model.songObject.isDownload = YES;
                 model.songObject.fileSize = [DPMusicPlayTool calculateFileSize:response.expectedContentLength];
                 model.songObject.fileSizeNum = response.expectedContentLength;

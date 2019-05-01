@@ -49,6 +49,8 @@
         self.isDownload = data.isDownload;
         self.playURL = data.playURL;
         self.localFileURL = data.localFileURL;
+        self.fileSize = data.fileSize;
+        self.fileSizeNum = data.fileSizeNum;
         if(data.lyricObject != nil){
             DPLocalLyricObject *object = [[DPLocalLyricObject alloc] initWithBaseLyric:data.lyricObject.baseLyricl isRoll:data.lyricObject.isRoll lyricConnect:data.lyricObject.lyricConnect songID:data.songid];
             self.lyricObject = object;

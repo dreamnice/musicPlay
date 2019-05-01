@@ -194,7 +194,9 @@
                         @"baseLyric"    : data.lyricObject.baseLyricl,
                         @"singger"      : data.singerArray[0].name,
                         @"isDownload"   : [NSNumber numberWithBool:YES],
-                        @"localFileURL" : data.localFileURL
+                        @"localFileURL" : data.localFileURL,
+                        @"fileSize"     : data.fileSize,
+                        @"fileSizeNum"  : [NSNumber numberWithLongLong:data.fileSizeNum]
                         };
             }else{
                 dic = @{
@@ -206,7 +208,9 @@
                         @"interval"     : [NSNumber numberWithInteger:data.interval],
                         @"singger"      : data.singerArray[0].name,
                         @"isDownload"   : [NSNumber numberWithBool:YES],
-                        @"localFileURL" : data.localFileURL
+                        @"localFileURL" : data.localFileURL,
+                        @"fileSize"     : data.fileSize,
+                        @"fileSizeNum"  : [NSNumber numberWithLongLong:data.fileSizeNum]
                         };
             }
         }else{

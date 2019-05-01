@@ -206,6 +206,7 @@ static dispatch_once_t token;
         [DPMusicPlayTool encodQQLyric:[dict2 objectForKey:@"lyric"] complete:^(NSArray * _Nonnull timeArray, NSArray * _Nonnull lyricArray, NSString * _Nonnull baseLyric, BOOL isRoll) {
             lyricModel *model = [[lyricModel alloc] initWithTimeArray:timeArray lyricArray:lyricArray baseLyric:baseLyric isRoll:isRoll lyricConect:YES lyricID:data.songid];
             data.lyricObject = model;
+            data.lyricObject.lyricConnect = YES;
             if(data.isDownload){
                 DPLocalMusicObject *object = [[DPLocalMusicObject alloc] initWithSongData:data];
                 [[DPRealmOperation shareOperation] addLocalMusicObject:object];
