@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setAlbumImageWithURL:(NSString *)url;
 
+- (void)setAlbumImageWithImage:(UIImage *)image;
+
 - (void)setImageAnimation:(BOOL)animation;
 
 - (void)changeLyricAndAlbumHidden;

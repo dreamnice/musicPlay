@@ -315,9 +315,13 @@
     self.lyricBtn.hidden = temp;
 }
 
-//设置专辑图片
+//通过URL设置专辑图片
 - (void)setAlbumImageWithURL:(NSString *)url {
     [self.albumView setImageWithURL:url];
+}
+//通过image设置专辑图片
+- (void)setAlbumImageWithImage:(UIImage *)image {
+    [self.albumView setImageWithImage:image];
 }
 
 - (void)setImageAnimation:(BOOL)animation {

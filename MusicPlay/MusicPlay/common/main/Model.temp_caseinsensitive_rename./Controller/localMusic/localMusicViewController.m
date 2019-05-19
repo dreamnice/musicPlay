@@ -12,6 +12,7 @@
 #import "playViewController.h"
 #import "DPRealmOperation.h"
 #import "downloadingViewController.h"
+#import "MBProgressHUD+JJ.h"
 
 @interface localMusicViewController ()<UITableViewDelegate, UITableViewDataSource>
 
@@ -36,6 +37,7 @@
             songData *data = [[songData alloc] initWithLocalMusicObject:object];
             [self.songDataArray addObject:data];
         }
+        [self.songDataArray addObjectsFromArray:[DPMusicPlayTool getItunesSong]];
     }
     return self;
 }
@@ -96,18 +98,21 @@
     if (editingStyle != UITableViewCellEditingStyleDelete){
         return;
     }
-    [[DPRealmOperation shareOperation] deleteLocalMusicObjectWithSongid:self.songDataArray[indexPath.row - 1].songid];
-    NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *path = [cachesPath stringByAppendingString:self.songDataArray[indexPath.row - 1].localFileURL];
-    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    self.songDataArray[indexPath.row - 1].isDownload = NO;
-    self.songDataArray[indexPath.row - 1].localFileURL = nil;
-    self.songDataArray[indexPath.row - 1].fileSizeNum = 0;
-    self.songDataArray[indexPath.row - 1].fileSize = nil;
-    [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicDelete object:self.songDataArray[indexPath.row - 1].songid];
-    [self.songDataArray removeObjectAtIndex:indexPath.row - 1];
-    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-
+    if(self.songDataArray[indexPath.row - 1].isFromItunes){
+        [MBProgressHUD showMessage:@"itunes的歌无法删除"];
+    }else{
+        [[DPRealmOperation shareOperation] deleteLocalMusicObjectWithSongid:self.songDataArray[indexPath.row - 1].songid];
+        NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+        NSString *path = [cachesPath stringByAppendingString:self.songDataArray[indexPath.row - 1].localFileURL];
+        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+        self.songDataArray[indexPath.row - 1].isDownload = NO;
+        self.songDataArray[indexPath.row - 1].localFileURL = nil;
+        self.songDataArray[indexPath.row - 1].fileSizeNum = 0;
+        self.songDataArray[indexPath.row - 1].fileSize = nil;
+        [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicDelete object:self.songDataArray[indexPath.row - 1].songid];
+        [self.songDataArray removeObjectAtIndex:indexPath.row - 1];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    }
 }
 /*
    0x7ff2fe168320
@@ -144,6 +149,7 @@
         songData *data = [[songData alloc] initWithLocalMusicObject:object];
         [self.songDataArray addObject:data];
     }
+    [self.songDataArray addObjectsFromArray:[DPMusicPlayTool getItunesSong]];
     [self.resultTableView reloadData];
 }
 

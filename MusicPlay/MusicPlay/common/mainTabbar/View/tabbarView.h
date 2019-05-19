@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setImageAnimation:(BOOL)animation;
 
+- (void)setAlbumImageWithImage:(UIImage *)image;
+
 @end
 
 NS_ASSUME_NONNULL_END

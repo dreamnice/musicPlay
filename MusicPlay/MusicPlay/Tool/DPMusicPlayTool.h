@@ -24,11 +24,14 @@ NS_ASSUME_NONNULL_BEGIN
 //解析歌手名+专辑名
 + (NSString *)getSingerAndAlbumTxt:(songData *)song;
 
+//获取itune音乐
++ (NSArray <songData *>*)getItunesSong;
+
 //解析时间
 + (NSString *)encodeTimeWithNum:(NSInteger)num;
 
-//存储上一次播放歌曲到本地
-+ (void)saveLastSongData:(songData *)data;
+//存储上一次播放与播放状态歌曲到本地
++ (void)savePlayStateAndLastSongData:(songData *)data;
 
 //得到上一次播放歌曲
 + (songData *)getLastPlaySong;

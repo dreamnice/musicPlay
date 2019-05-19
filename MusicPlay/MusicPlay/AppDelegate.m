@@ -50,8 +50,8 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    [DPMusicPlayTool savePlayStateAndLastSongData:[[playManager sharedPlay] songData]];
     NSLog(@"退出程序了");
-    [DPMusicPlayTool saveLastSongData:[[playManager sharedPlay] songData]];
 }
 
 @end

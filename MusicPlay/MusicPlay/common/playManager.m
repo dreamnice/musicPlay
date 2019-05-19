@@ -100,6 +100,7 @@ static dispatch_once_t token;
         _songData = data;
         [self.songListArray addObject:data];
     }
+    _playState = [[NSUserDefaults standardUserDefaults] integerForKey:DPUserDefaultsPlayState];
 }
 
 #pragma mark - methoes
@@ -119,10 +120,14 @@ static dispatch_once_t token;
     self.currentTime = 0;
     [self setNowPlayingInfo];
     if(songData.localFileURL != nil){
-        NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-        NSString *path = [cachesPath stringByAppendingString:songData.localFileURL];
-        NSLog(@"--------用本地文件播放----------");
-        [self playWithFileURL:path];
+        if(songData.isFromItunes){
+            [self playWithURL:songData.localFileURL];
+        }else{
+            NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+            NSString *path = [cachesPath stringByAppendingString:songData.localFileURL];
+            NSLog(@"--------用本地文件播放----------");
+            [self playWithFileURL:path];
+        }
     }else{
         if(songData.playURL != nil && !songData.cutPlay){
             NSLog(@"--------用本地播放URL播放----------");
@@ -338,8 +343,13 @@ static dispatch_once_t token;
             break;
         case playStateRandomType:
         {
-            NSInteger index = arc4random() % self.songListArray.count;
-            self.currentIndex = index;
+            if(self.songListArray.count > 1){
+                NSInteger index = arc4random() % self.songListArray.count;
+                while (self.currentIndex == index) {
+                    index = arc4random() % self.songListArray.count;
+                }
+                self.currentIndex = index;
+            }
         }
             break;
         case playStateOneCycleType:
@@ -382,9 +392,16 @@ static dispatch_once_t token;
                 break;
             case playStateRandomType:
             {
-                NSInteger index = arc4random() % self.songListArray.count;
-                self.currentIndex = index;
+                if(self.songListArray.count > 1){
+                    NSInteger index = arc4random() % self.songListArray.count;
+                    while (self.currentIndex == index) {
+                        index = arc4random() % self.songListArray.count;
+                    }
+                    self.currentIndex = index;
+                }
+      
             }
+                break;
             case playStateOneCycleType:
             {
                 if(self.currentIndex <= 0){
@@ -599,14 +616,27 @@ static dispatch_once_t token;
     }
     //设置专辑
     [self.remoteDic setObject:self.songData.albumname forKey:MPMediaItemPropertyAlbumTitle];
-    //设置专辑封面
-    MPMediaItemArtwork *artImage = [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(300, 300) requestHandler:^UIImage * _Nonnull(CGSize size) {
-        NSString *imageURL = [NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.songData.albummid];
-        NSString *encodeURL = [imageURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-        NSData * data = [NSData dataWithContentsOfURL:[NSURL URLWithString:encodeURL]];
-        UIImage *image = [UIImage imageWithData:data];
-        return image;
-    }];
+    MPMediaItemArtwork *artImage = nil;
+    if(self.songData.isFromItunes){
+        if(self.songData.albumImage){
+            artImage = [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(300, 300) requestHandler:^UIImage * _Nonnull(CGSize size) {
+                return self.songData.albumImage;
+            }];
+        }else{
+            artImage = [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(300, 300) requestHandler:^UIImage * _Nonnull(CGSize size) {
+                return [UIImage imageNamed:@"cm2_default_cover_fm"];
+            }];
+        }
+    }else{
+        //设置专辑封面
+        artImage = [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(300, 300) requestHandler:^UIImage * _Nonnull(CGSize size) {
+            NSString *imageURL = [NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.songData.albummid];
+            NSString *encodeURL = [imageURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+            NSData * data = [NSData dataWithContentsOfURL:[NSURL URLWithString:encodeURL]];
+            UIImage *image = [UIImage imageWithData:data];
+            return image;
+        }];
+    }
     [self.remoteDic setObject:artImage forKey:MPMediaItemPropertyArtwork];
     //设置总时长
     [self.remoteDic setObject:[NSNumber numberWithDouble:self.songData.interval] forKey:MPMediaItemPropertyPlaybackDuration];
@@ -629,6 +659,7 @@ static dispatch_once_t token;
         }
     }
 }
+
 #pragma mark - 懒加载
 - (AVPlayer *)myPlayer{
     if(!_myPlayer){

@@ -48,7 +48,11 @@
     //获取上一首歌
     self.data = [[playManager sharedPlay] songData];
     if(self.data){
-        [self.myTabbarView setAlbumImageWithURL:[NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.data.albummid]];
+        if(self.data.isFromItunes){
+            [self.myTabbarView setAlbumImageWithImage:self.data.albumImage];
+        }else{
+            [self.myTabbarView setAlbumImageWithURL:[NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.data.albummid]];
+        }
         [self.myTabbarView setSongName:self.data.songname];
         [self.myTabbarView setNextText:self.data.singerArray[0].name];
     }
@@ -68,7 +72,11 @@
     /*
      0x7ff2fe168320
      */
-    [self.myTabbarView setAlbumImageWithURL:[NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.data.albummid]];
+    if(self.data.isFromItunes){
+        [self.myTabbarView setAlbumImageWithImage:self.data.albumImage];
+    }else{
+        [self.myTabbarView setAlbumImageWithURL:[NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.data.albummid]];
+    }
     [self.myTabbarView setSongName:self.data.songname];
     [self.myTabbarView setNextText:self.data.singerArray[0].name];
     lastLyric = @"";

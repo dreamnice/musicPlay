@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setImageWithURL:(NSString *)url;
 
+- (void)setImageWithImage:(UIImage *)image;
+
 - (void)setImageAnimation:(BOOL)animation;
 
 @end

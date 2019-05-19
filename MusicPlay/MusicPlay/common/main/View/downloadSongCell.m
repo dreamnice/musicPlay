@@ -100,7 +100,7 @@
         make.top.equalTo(songNameLabel.mas_bottom).offset(6.5);
         make.left.mas_equalTo(self.contentView.mas_left).offset(45);
         make.height.mas_equalTo(20);
-        make.width.mas_equalTo(80);
+        make.width.mas_equalTo(83);
     }];
     self.fileSizeProgressLabel = fileSizeProgressLabel;
     

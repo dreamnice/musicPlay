@@ -44,6 +44,7 @@ typedef void (^DeleteComplete)();
  static NSString * const DPMusicDownloadAddNew = @"musicDownload_add";
  static NSString * const DPMusicDownloadSuccess = @"musicDownload_success";
  static NSString * const DPMusicDelete = @"musicDelete";
-
+ static NSString * const DPUserDefaultsLastMusic = @"lastMusic";
+ static NSString * const DPUserDefaultsPlayState = @"playManagerState";
 #endif /* PrefixHeader_pch */
 

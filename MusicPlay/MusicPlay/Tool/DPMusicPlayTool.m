@@ -158,7 +158,7 @@
 
 + (songData *)getLastPlaySong {
     songData *data = nil;
-    NSDictionary *dic = [[NSUserDefaults standardUserDefaults] objectForKey:@"lastMusic"];
+    NSDictionary *dic = [[NSUserDefaults standardUserDefaults] objectForKey:DPUserDefaultsLastMusic];
     if(dic){
         data = [songData mj_objectWithKeyValues:dic];
         if([dic objectForKey:@"baseLyric"]){
@@ -178,9 +178,67 @@
     }
     return data;
 }
+//解析本地音乐
++ (NSArray <songData *>*)getItunesSong {
+    // 1.创建媒体选择队列（从ipod库中读出音乐文件）
+    MPMediaQuery *everything = [MPMediaQuery songsQuery];
+    // 2.创建读取条件(类似于对数据做一个筛选)  Value：作用等同于MPMediaType枚举值
+    MPMediaPropertyPredicate *albumNamePredicate = [MPMediaPropertyPredicate predicateWithValue:[NSNumber numberWithInt:MPMediaTypeMusic ] forProperty: MPMediaItemPropertyMediaType];
+    //3.给队列添加读取条件
+    [everything addFilterPredicate:albumNamePredicate];
+    //4.从队列中获取符合条件的数组集合
+    NSArray *itemsFromGenericQuery = [everything items];
+    //5.便利解析数据
+    NSMutableArray  <songData *>*musicArray = [self resolverMediaItem:itemsFromGenericQuery];
+    return musicArray;
+}
 
-+ (void)saveLastSongData:(songData *)data {
-    if(data){
+#pragma mark -解析iTune音乐数据
++ (NSMutableArray <songData *>*)resolverMediaItem:(NSArray *)songArray {
+    NSMutableArray <songData *>*ituneSongArray = [NSMutableArray array];
+    for (MPMediaItem *song in songArray) {
+        //歌曲路径(有些歌曲有版权,拿不到路径直接跳过)
+        NSURL *url = [song valueForProperty: MPMediaItemPropertyAssetURL];
+        if(url == nil){
+            continue;
+        }
+        NSString *fileStr = [url absoluteString];
+        //歌名
+        NSString *name = [song valueForProperty: MPMediaItemPropertyTitle];
+        //歌手名字
+        NSString *singer = [song valueForProperty: MPMediaItemPropertyArtist];
+        //歌曲时长（单位：秒）
+        NSInteger interval = [[song valueForProperty: MPMediaItemPropertyPlaybackDuration] integerValue];
+        //专辑名称
+        NSString *albumStr = [song valueForKeyPath:MPMediaItemPropertyAlbumTitle];
+        if(singer == nil){
+            singer = @"未知歌手";
+        }
+        //歌曲插图（如果没有插图，则返回nil）
+        MPMediaItemArtwork *artwork = [song valueForProperty: MPMediaItemPropertyArtwork];
+        //从插图中获取图像，参数size是图像的大小
+        UIImage *image = [artwork imageWithSize:CGSizeMake(50, 50)];
+        
+        songData *data = [[songData alloc] init];
+        data.isDownload = YES;
+        data.isFromItunes = YES;
+        data.songname = name;
+        data.albumname = albumStr;
+        data.localFileURL = fileStr;
+        data.albumImage = image;
+        data.interval = interval;
+        singerData *singerdata = [[singerData alloc] init];
+        singerdata.name = singer;
+        [data.singerArray addObject:singerdata];
+        data.fileSize = @"未知";
+        [ituneSongArray addObject:data];
+    }
+  
+    return ituneSongArray;
+}
+
++ (void)savePlayStateAndLastSongData:(songData *)data {
+    if(data && !data.isFromItunes){
         NSDictionary *dic = nil;
         if(data.isDownload){
             if(data.lyricObject){
@@ -193,10 +251,11 @@
                         @"interval"     : [NSNumber numberWithInteger:data.interval],
                         @"baseLyric"    : data.lyricObject.baseLyricl,
                         @"singger"      : data.singerArray[0].name,
-                        @"isDownload"   : [NSNumber numberWithBool:YES],
+                        @"isDownload"   : [NSNumber numberWithBool:data.isDownload],
                         @"localFileURL" : data.localFileURL,
                         @"fileSize"     : data.fileSize,
-                        @"fileSizeNum"  : [NSNumber numberWithLongLong:data.fileSizeNum]
+                        @"fileSizeNum"  : [NSNumber numberWithLongLong:data.fileSizeNum],
+                        @"isFromItunes" : [NSNumber numberWithBool:data.isFromItunes]
                         };
             }else{
                 dic = @{
@@ -207,10 +266,11 @@
                         @"albummid"     : data.albummid,
                         @"interval"     : [NSNumber numberWithInteger:data.interval],
                         @"singger"      : data.singerArray[0].name,
-                        @"isDownload"   : [NSNumber numberWithBool:YES],
+                        @"isDownload"   : [NSNumber numberWithBool:data.isDownload],
                         @"localFileURL" : data.localFileURL,
                         @"fileSize"     : data.fileSize,
-                        @"fileSizeNum"  : [NSNumber numberWithLongLong:data.fileSizeNum]
+                        @"fileSizeNum"  : [NSNumber numberWithLongLong:data.fileSizeNum],
+                        @"isFromItunes" : [NSNumber numberWithBool:data.isFromItunes]
                         };
             }
         }else{
@@ -223,7 +283,8 @@
                         @"albummid"  : data.albummid,
                         @"interval"  : [NSNumber numberWithInteger:data.interval],
                         @"baseLyric" : data.lyricObject.baseLyricl,
-                        @"singger"   : data.singerArray[0].name
+                        @"singger"   : data.singerArray[0].name,
+                        @"isFromItunes" : [NSNumber numberWithBool:data.isFromItunes]
                         };
             }else{
                 dic = @{
@@ -233,13 +294,15 @@
                         @"albumname" : data.albumname,
                         @"albummid"  : data.albummid,
                         @"interval"  : [NSNumber numberWithInteger:data.interval],
-                        @"singger"   : data.singerArray[0].name
+                        @"singger"   : data.singerArray[0].name,
+                        @"isFromItunes" : [NSNumber numberWithBool:data.isFromItunes]
                         };
             }
         }
-        [[NSUserDefaults standardUserDefaults] setObject:dic forKey:@"lastMusic"];
-        [[NSUserDefaults standardUserDefaults]  synchronize];
+        [[NSUserDefaults standardUserDefaults] setObject:dic forKey:DPUserDefaultsLastMusic];
     }
+    [[NSUserDefaults standardUserDefaults] setInteger:[[playManager sharedPlay] playState] forKey:DPUserDefaultsPlayState];
+    [[NSUserDefaults standardUserDefaults]  synchronize];
 }
 
 

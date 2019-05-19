@@ -71,8 +71,17 @@ static dispatch_once_t token;
     return object;
 }
 
+//ascending 升序
+- (RLMResults <DPResumeDataObject *>*)queryResumeSongData {
+    RLMResults *results = [DPResumeDataObject allObjects];
+    return [results sortedResultsUsingKeyPath:@"uploadDate" ascending:NO];
+}
+
 #pragma mark - 歌曲
 - (void)addLocalMusicObject:(DPLocalMusicObject *)object {
+    if(object == nil){
+        return;
+    }
     [self.realm beginWriteTransaction];
     [self.realm addOrUpdateObject:object];
     [self.realm commitWriteTransaction];
@@ -102,10 +111,5 @@ static dispatch_once_t token;
     return [results sortedResultsUsingKeyPath:@"uploadDate" ascending:NO];
 }
 
-//ascending 升序
-#pragma mark - 断点续传
-- (RLMResults <DPResumeDataObject *>*)queryResumeSongData {
-    RLMResults *results = [DPResumeDataObject allObjects];
-    return [results sortedResultsUsingKeyPath:@"uploadDate" ascending:NO];
-}
+
 @end

@@ -48,7 +48,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteControlProgress:) name:DPMusicRemoteChange object:index];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(songTotalTimeChange) name:DPMusicTotalTimeChange object:nil];
         self.isTabbar = isTabbar;
-        if(song.isLastSong){
+        if(!isTabbar && [song.songid isEqualToString:[[playManager sharedPlay] songData].songid] && ![[playManager sharedPlay] songData].isLastSong ){
             self.isTabbar = YES;
         }
     }
@@ -90,8 +90,12 @@
     [self.controlView setRightLabelText:self.songData.interval];
     [self.controlView changePlayTypeBtn:[[playManager sharedPlay] playState]];
     [self.infoView setSongName:self.songData.songname singerName:self.songData.singerArray[0].name];
-    NSString *imageStr = [NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.songData.albummid];
-    [self.infoView setAlbumImageWithURL:imageStr];
+    if(self.songData.albumImage){
+        [self.infoView setAlbumImageWithImage:self.songData.albumImage];
+    }else{
+        NSString *imageStr = [NSString stringWithFormat:@"https://y.gtimg.cn/music/photo_new/T002R300x300M000%@.jpg",self.songData.albummid];
+        [self.infoView setAlbumImageWithURL:imageStr];
+    }
     if(manager.isPlay){
         [self.infoView setImageAnimation:YES];
         [self.controlView changePlayBtnPlay:YES];
@@ -174,19 +178,21 @@
     if(data.isDownload){
         btn.enabled = YES;
         [self showAlertWihtMessage:@"歌曲已下载过"];
+    }else{
+        NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+        __weak __typeof__(self) weakself = self;
+        [[DPMusicDownLoadTool shareTool] AFDownLoadFileWithSongData:data addComplete:^(BOOL inDownloadQueue, BOOL downloadURLFailure) {
+            if(!inDownloadQueue && !downloadURLFailure){
+                [self showAlertWihtMessage:@"已加入下载队列"];
+            }else if(inDownloadQueue){
+                [self showAlertWihtMessage:@"歌曲正在下载"];
+            }else{
+                [self showAlertWihtMessage:@"获取下载地址失败"];
+            }
+            btn.enabled = YES;
+        } progress:nil success:nil failure:nil];
+
     }
-    NSString *cachesPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    __weak __typeof__(self) weakself = self;
-    [[DPMusicDownLoadTool shareTool] AFDownLoadFileWithSongData:data addComplete:^(BOOL inDownloadQueue, BOOL downloadURLFailure) {
-        if(!inDownloadQueue && !downloadURLFailure){
-            [self showAlertWihtMessage:@"已加入下载队列"];
-        }else if(inDownloadQueue){
-            [self showAlertWihtMessage:@"歌曲正在下载"];
-        }else{
-            [self showAlertWihtMessage:@"获取下载地址失败"];
-        }
-        btn.enabled = YES;
-    } progress:nil success:nil failure:nil];
 }
 
 #pragma mark - 歌词设置

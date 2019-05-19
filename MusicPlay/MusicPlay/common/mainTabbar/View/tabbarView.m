@@ -80,6 +80,10 @@
     [self.albumImageView setImageWithURL:url];
 }
 
+- (void)setAlbumImageWithImage:(UIImage *)image {
+    [self.albumImageView setImageWithImage:image];
+}
+
 - (void)setAlbumImageAngle:(CGFloat)angle {
     self.albumImageView.transform = CGAffineTransformRotate(self.albumImageView.transform, angle);
 }

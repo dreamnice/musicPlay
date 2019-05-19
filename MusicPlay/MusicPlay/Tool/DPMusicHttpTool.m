@@ -207,7 +207,7 @@ static dispatch_once_t token;
             lyricModel *model = [[lyricModel alloc] initWithTimeArray:timeArray lyricArray:lyricArray baseLyric:baseLyric isRoll:isRoll lyricConect:YES lyricID:data.songid];
             data.lyricObject = model;
             data.lyricObject.lyricConnect = YES;
-            if(data.isDownload){
+            if(data.isDownload && !data.isFromItunes){
                 DPLocalMusicObject *object = [[DPLocalMusicObject alloc] initWithSongData:data];
                 [[DPRealmOperation shareOperation] addLocalMusicObject:object];
             }

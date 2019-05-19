@@ -20,6 +20,8 @@
 
 @property (nonatomic, strong) UITableView *resultTableView;
 
+@property (nonatomic, strong) UISearchBar *searchBar;
+
 @property (nonatomic, assign) NSInteger pageCount;
 
 @property (nonatomic, copy) NSString *keyWorld;
@@ -32,6 +34,7 @@
     self = [super init];
     if(self){
         searchBar.delegate = self;
+        self.searchBar = searchBar;
         //下载成功重新刷新界面
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadSuccess) name:DPMusicDownloadSuccess object:nil];
     }
@@ -81,7 +84,7 @@
 }
 
 /*----------------Delegate-----------------*/
-#pragma mark - UITableViewDelegate
+#pragma mark - UITableViewDataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return self.songDataArray.count;
 }
@@ -90,12 +93,13 @@
     return 55;
 }
 
-#pragma mark - UITableViewDataSource
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     songTableViewCell *cell = [songTableViewCell cellWithTableView:tableView];
-    cell.songNameLabel.text = self.songDataArray[indexPath.row].songname;
-    cell.singerAndAlbumLabel.text = [DPMusicPlayTool getSingerAndAlbumTxt:self.songDataArray[indexPath.row]];
-    [cell setDownLoadimageView:self.songDataArray[indexPath.row].isDownload];
+    if(indexPath.row < self.songDataArray.count){
+        cell.songNameLabel.text = self.songDataArray[indexPath.row].songname;
+        cell.singerAndAlbumLabel.text = [DPMusicPlayTool getSingerAndAlbumTxt:self.songDataArray[indexPath.row]];
+        [cell setDownLoadimageView:self.songDataArray[indexPath.row].isDownload];
+    }
     return cell;
 }
 
@@ -103,6 +107,15 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [[playManager sharedPlay] getSongList:self.songDataArray currentIndex:indexPath.row];
     [[NSNotificationCenter defaultCenter] postNotificationName:DPMusicClick object:self.songDataArray[indexPath.row]];
+}
+
+#pragma mark - UITableViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    if([self.searchBar isFirstResponder]){
+        [self.searchBar resignFirstResponder];
+        UIButton *cancelBtn = [self.searchBar valueForKey:@"cancelButton"]; //首先取出cancelBtn
+        cancelBtn.enabled = YES; //把enabled设置为yes
+    }
 }
 
 #pragma mark - UISearchBarDelegate

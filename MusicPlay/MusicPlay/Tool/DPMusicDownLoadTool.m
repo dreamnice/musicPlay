@@ -243,8 +243,25 @@ static dispatch_once_t token;
             if(filePath){
                 model.songObject.localFileURL = [NSString stringWithFormat:@"/%@.m4a",model.songObject.songid];
                 model.songObject.isDownload = YES;
-                model.songObject.fileSize = [DPMusicPlayTool calculateFileSize:response.expectedContentLength];
-                model.songObject.fileSizeNum = response.expectedContentLength;
+                NSFileManager *filesManager = [NSFileManager defaultManager];
+                BOOL isDirectory = NO;
+                long long fileSize = 0;
+                NSString *filestr = [filePath absoluteString];
+                filestr = [filestr substringFromIndex:7];
+                if([filesManager fileExistsAtPath:filestr isDirectory:&isDirectory]){
+                    NSDictionary * attributes = [filesManager attributesOfItemAtPath:filestr error:nil];
+                    // file size
+                    NSNumber *theFileSize;
+                    if ((theFileSize = [attributes objectForKey:NSFileSize])){
+                        fileSize = [theFileSize longLongValue];
+                    }
+                }
+                NSLog(@"%lld",fileSize);
+                if(fileSize == 0){
+                    fileSize = response.expectedContentLength;
+                }
+                model.songObject.fileSize = [DPMusicPlayTool calculateFileSize:fileSize];
+                model.songObject.fileSizeNum = fileSize;
                 DPLocalMusicObject *object = [[DPLocalMusicObject alloc] initWithSongData:model.songObject localFileURL:[NSString stringWithFormat:@"/%@.m4a",model.songObject.songid]];
                 [[DPRealmOperation shareOperation] addLocalMusicObject:object];
             }

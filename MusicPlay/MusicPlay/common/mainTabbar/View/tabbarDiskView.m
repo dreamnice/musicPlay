@@ -38,7 +38,7 @@
     
     [self.diskView addSubview:self.albumView];
     
-    CGFloat height = 30;
+    CGFloat height = 31;
     [self.albumView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.center.equalTo(self.diskView);
         make.width.height.mas_equalTo(height);
@@ -58,6 +58,10 @@
     }else {
         self.albumView.image = [UIImage imageNamed:@"cm2_default_cover_fm"];
     }
+}
+
+- (void)setImageWithImage:(UIImage *)image; {
+    self.albumView.image = image;
 }
 
 - (void)setImageAnimation:(BOOL)animation {

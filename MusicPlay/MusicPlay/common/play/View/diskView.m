@@ -61,6 +61,10 @@
     }
 }
 
+- (void)setImageWithImage:(UIImage *)image {
+    [self.albumView setImage:image];
+}
+
 - (void)setImageAnimation:(BOOL)animation {
     [self.link setPaused:!animation];
 }

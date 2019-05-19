@@ -81,4 +81,10 @@
              };
 }
 
+- (NSMutableArray <singerData *>*)singerArray {
+    if(!_singerArray){
+        _singerArray = [NSMutableArray array];
+}
+    return _singerArray;
+}
 @end

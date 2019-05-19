@@ -11,6 +11,9 @@
 @implementation DPLocalMusicObject
 
 - (instancetype)initWithSongData:(songData *)data localFileURL:(NSString *)url {
+    if(data.isFromItunes){
+        return nil;
+    }
     self = [super init];
     if(self){
         self.uploadDate = [NSDate date];
@@ -37,6 +40,9 @@
 }
 
 - (instancetype)initWithSongData:(songData *)data {
+    if(data.isFromItunes){
+        return nil;
+    }
     self = [super init];
     if(self){
         self.uploadDate = [NSDate date];

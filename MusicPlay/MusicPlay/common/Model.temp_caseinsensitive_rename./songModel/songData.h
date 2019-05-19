@@ -45,6 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *fileSize;
 
+@property (nonatomic, strong) UIImage *albumImage;
+
 @property (nonatomic, strong) lyricModel *lyricObject;
 
 @property (nonatomic, assign) int64_t fileSizeNum;
@@ -54,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL cutPlay;
 
 @property (nonatomic, assign) BOOL isLastSong;
+
+@property (nonatomic, assign) BOOL isFromItunes;
 
 @end
 

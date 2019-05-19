@@ -42,7 +42,7 @@
                 break;
                 case DPRandomMusicType:
             {
-                self.title = @"随机歌曲";
+                self.title = @"推荐歌曲";
                 [[DPMusicHttpTool shareTool] getRandomMusicSuccess:^(NSArray<songData *> * _Nonnull songDataArray, BOOL noData) {
                     weakself.songDataArray = [songDataArray mutableCopy];
                     [weakself.resultTableView reloadData];
