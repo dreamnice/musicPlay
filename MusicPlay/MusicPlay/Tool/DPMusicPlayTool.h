@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)calculateFileSize:(unsigned long long)contentLength;
 
++ (long long)getFileSizeAtPath:(NSString *)path;
+
 //解析歌手名+专辑名
 + (NSString *)getSingerAndAlbumTxt:(songData *)song;
 

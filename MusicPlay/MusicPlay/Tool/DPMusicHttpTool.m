@@ -63,8 +63,12 @@ static dispatch_once_t token;
             if(baseArray.count > 0){
                 noData = NO;
             }
+            NSString *lastSongName = @"";
             for(NSDictionary *dataDic in baseArray){
                 songData *data = [songData mj_objectWithKeyValues:dataDic];
+                if([data.songname isEqualToString:lastSongName] && page != 1){
+                    continue;
+                }
                 if(![data.songmid isEqualToString:@""] && data.songmid != nil){
                     DPLocalMusicObject *obj = [[DPRealmOperation shareOperation] queryWithSongid:data.songid];
                     data.isDownload = obj.isDownload;
@@ -78,6 +82,7 @@ static dispatch_once_t token;
                             }];
                         }
                     }
+                    lastSongName = data.songname;
                     [songDataArray addObject:data];
                 }
             }
@@ -180,12 +185,15 @@ static dispatch_once_t token;
     NSString *playTokenURL = [NSString stringWithFormat:@"https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg?format=json205361747&platform=yqq&cid=205361747&songmid=%@&filename=C400%@.m4a&guid=126548448",songMid,songMid];
     NSString *fileName = [NSString stringWithFormat:@"C400%@.m4a",songMid];
     [self.manager GET:playTokenURL parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        NSLog(@"%@",playTokenURL);
         NSString *playString = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         NSLog(@"%@",playString);
         NSError *err2;
         id dict2 = [NSJSONSerialization  JSONObjectWithData:[playString dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&err2];
         NSString *playKey = dict2[@"data"][@"items"][0][@"vkey"];
         if(playKey){
+           // 5DD867076616DFF4D1F446C0384CFA82DC7082FA98605890862A23F32D8A17D948CE6601399F8137DF91394FE369772E9124FA6545FC4D7C
+            //C400004AeIvh4ML0Bz
             NSString *playkeyUrl = [NSString stringWithFormat:@"http://ws.stream.qqmusic.qq.com/%@?fromtag=0&guid=126548448&vkey=%@",fileName,playKey];
             success(playkeyUrl);
         }else{

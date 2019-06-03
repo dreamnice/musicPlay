@@ -169,7 +169,6 @@ static dispatch_once_t token;
         }
         if (progress) {
             dispatch_async(dispatch_get_main_queue(), ^{
-        
             });
         }
     } destination:^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
@@ -243,20 +242,9 @@ static dispatch_once_t token;
             if(filePath){
                 model.songObject.localFileURL = [NSString stringWithFormat:@"/%@.m4a",model.songObject.songid];
                 model.songObject.isDownload = YES;
-                NSFileManager *filesManager = [NSFileManager defaultManager];
-                BOOL isDirectory = NO;
-                long long fileSize = 0;
-                NSString *filestr = [filePath absoluteString];
-                filestr = [filestr substringFromIndex:7];
-                if([filesManager fileExistsAtPath:filestr isDirectory:&isDirectory]){
-                    NSDictionary * attributes = [filesManager attributesOfItemAtPath:filestr error:nil];
-                    // file size
-                    NSNumber *theFileSize;
-                    if ((theFileSize = [attributes objectForKey:NSFileSize])){
-                        fileSize = [theFileSize longLongValue];
-                    }
-                }
-                NSLog(@"%lld",fileSize);
+                NSString *fileStr = [filePath absoluteString];
+                fileStr = [fileStr substringFromIndex:7];
+                long long fileSize = [DPMusicPlayTool getFileSizeAtPath:fileStr];
                 if(fileSize == 0){
                     fileSize = response.expectedContentLength;
                 }

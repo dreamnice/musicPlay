@@ -230,7 +230,12 @@
         singerData *singerdata = [[singerData alloc] init];
         singerdata.name = singer;
         [data.singerArray addObject:singerdata];
-        data.fileSize = @"未知";
+        data.fileSizeNum = [DPMusicPlayTool getFileSizeAtPath:fileStr];
+        if(data.fileSizeNum == 0){
+            data.fileSize = @"未知";
+        }else{
+            data.fileSize = [DPMusicPlayTool calculateFileSize:data.fileSizeNum];
+        }
         [ituneSongArray addObject:data];
     }
   
@@ -335,4 +340,18 @@
     return writtenFileSize;
 }
 
++ (long long)getFileSizeAtPath:(NSString *)path {
+    BOOL isDirectory = NO;
+    long long fileSize = 0;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if([fileManager fileExistsAtPath:path isDirectory:&isDirectory]){
+        NSDictionary * attributes = [fileManager attributesOfItemAtPath:path error:nil];
+        // file size
+        NSNumber *theFileSize;
+        if ((theFileSize = [attributes objectForKey:NSFileSize])){
+            fileSize = [theFileSize longLongValue];
+        }
+    }
+    return fileSize;
+}
 @end
